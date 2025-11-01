@@ -1,0 +1,38 @@
+# OS / Editor
+.DS_Store
+.idea/
+.vscode/
+
+# Environment files
+.env
+.env.backup
+.env.local
+.env.testing
+.env.production
+
+# Laravel directories
+/vendor/
+node_modules/
+public/storage
+public/hot
+storage/*.key
+storage/pail
+public/build
+
+# Cache & Logs
+.phpunit.result.cache
+npm-debug.log
+yarn-error.log
+
+# Homestead & Vagrant
+Homestead.yaml
+Homestead.json
+.vagrant/
+
+# Docker
+docker-compose.override.yml
+docker/mysql/data/
+
+# PHP / Composer
+auth.json
+.phpactor.json
