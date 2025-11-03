@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('break_times', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->unsignedBigInteger('user_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('attendance_id')->constrained()->cascadeOnDelete();
+            $table->time('break_start_time')->nullable();
+            $table->time('break_end_time')->nullable();
             $table->timestamps();
-            $table->tinyInteger('role')->default(1);//0:管理者, 1:一般
         });
     }
 
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        //
     }
 };
