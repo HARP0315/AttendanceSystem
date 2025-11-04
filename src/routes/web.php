@@ -5,6 +5,7 @@ use App\Http\Controllers\StaffAttendanceController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\StaffAttendanceCorrectionController;
 use App\Http\Controllers\AdminCorrectionRequestController;
+use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,23 +18,24 @@ use App\Http\Controllers\AdminCorrectionRequestController;
 |
 */
 
+
 // ---------------------------
 // スタッフ用
 // ---------------------------
-Route::prefix('')->middleware(['auth', 'staff.verified'])->group(function () {
+Route::prefix('')->middleware(['auth','staff.verified'])->group(function () {
     Route::get('/attendance', [StaffAttendanceController::class, 'index'])->name('attendance.index');
     // ここに他のスタッフページも追加
 });
 
 // 登録画面（スタッフ用）
-Route::get('/register', function () {
-    return view('auth.staff-register');
-})->middleware('guest')->name('register');
+// Route::get('/register', function () {
+//     return view('auth.register');
+// })->middleware('guest')->name('register');
 
 // ログイン画面（スタッフ用）
-Route::get('/login', function () {
-    return view('auth.staff-login');
-})->middleware('guest')->name('login');
+// Route::get('/login', function () {
+//     return view('auth.login');
+// })->middleware('guest')->name('login');
 
 // ---------------------------
 // 管理者用
@@ -45,5 +47,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
 
 // 管理者ログイン画面
 Route::get('/admin/login', function () {
-    return view('admin.auth.login');
+    return view('auth.admin.login');
 })->middleware('guest')->name('admin.login');
+
+Route::post('/admin/login', [AuthenticatedSessionController::class, 'store']);

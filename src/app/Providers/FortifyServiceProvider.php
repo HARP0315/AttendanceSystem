@@ -20,6 +20,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Http\Requests\LoginRequest;
 use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+use App\Actions\Fortify\LoginResponse;
+use App\Actions\Fortify\LogoutResponse;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -57,7 +59,7 @@ class FortifyServiceProvider extends ServiceProvider
          * 管理者登録はここでは想定しない
          */
         Fortify::registerView(function () {
-            return view('auth.staff-register');
+            return view('auth.register');
         });
 
         /**
@@ -69,7 +71,7 @@ class FortifyServiceProvider extends ServiceProvider
                 return view('admin.auth.login');
             }
 
-            return view('auth.staff-login');
+            return view('auth.login');
         });
 
         /**
@@ -77,6 +79,11 @@ class FortifyServiceProvider extends ServiceProvider
          * スタッフ (role: 1) の登録のみを処理
          */
         Fortify::createUsersUsing(CreateNewUser::class);
+
+        // メール認証用ビュー
+        Fortify::verifyEmailView(function () {
+            return view('auth.verify-email');
+        });
 
         /**
          * ログイン認証処理
@@ -109,101 +116,17 @@ class FortifyServiceProvider extends ServiceProvider
         // ----------------------------------------
 
 
-        app()->bind(AuthenticatedSessionController::class, function () {
-            return new class extends AuthenticatedSessionController {
+        // ログイン後レスポンス
+        $this->app->singleton(
+            \Laravel\Fortify\Contracts\LoginResponse::class,
+            LoginResponse::class
+        );
 
-            /**
-             * ログイン後の遷移制御
-             * roleに応じて遷移先を変更
-             * スタッフのみメール認証をチェック
-             */
-            protected function authenticated(LoginRequest $request)
-            {
-                $user = Auth::user();
-                if ($user->role === 0) {
-                    return redirect('/admin/attendance/list');
-                }
-                if ($user->role === 1) {
-                    if ($user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail()) {
-                        return app(config('fortify.responses.email_verification_prompt'));
-                    }
-                    return redirect('/attendance');
-                }
-            }
-
-            /**
-             * ログアウト後の遷移制御
-             * ログアウト処理後は Auth::user() が使えないため、
-             * リクエスト元のURLを見て遷移先を判断
-             */
-            public function destroy(Request $request)
-            {
-                parent::destroy($request);
-
-                $referer = $request->headers->get('referer');
-                if ($referer && str_contains($referer, url('/admin'))) {
-                    return redirect('/admin/login');
-                }
-                return redirect('/login');
-            }
-        };
-    });
-
-        $this->app->singleton(AuthenticatedSessionController::class, function ($app) {
-
-            return new class(
-                $app[StatefulGuard::class]
-            ) extends AuthenticatedSessionController {
-
-                /**
-                 * ログイン後の遷移制御
-                 */
-                public function store(FortifyLoginRequest $request)
-                {
-                    // 本来のログイン処理を実行
-                    return $this->loginPipeline($request)->then(function ($request) {
-
-                        $user = Auth::user();
-
-                        // 0: 管理者
-                        if ($user->role === 0) {
-                            return redirect('/admin/attendance/list');
-                        }
-
-                        // 1: スタッフ
-                        if ($user->role === 1) {
-                            // スタッフ、かつ、メール認証がまだ
-                            if ($user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail()) {
-                                return app(config('fortify.responses.email_verification_prompt'));
-                            }
-                            // 認証済みスタッフ
-                            return redirect('/attendance');
-                        }
-
-                    });
-                }
-
-
-                /**
-                 * ログアウト後の遷移制御
-                 */
-                public function destroy(Request $request)
-                {
-
-                    $this->guard->logout();
-                    $request->session()->invalidate();
-                    $request->session()->regenerateToken();
-
-                    $referer = $request->headers->get('referer');
-
-                    if ($referer && str_contains($referer, url('/admin'))) {
-                        return redirect('/admin/login');
-                    }
-
-                    return redirect('/login');
-                }
-            };
-        });
+        // ログアウト後レスポンス
+        $this->app->singleton(
+            \Laravel\Fortify\Contracts\LogoutResponse::class,
+            LogoutResponse::class
+        );
 
         app()->bind(FortifyLoginRequest::class, LoginRequest::class);
     }
