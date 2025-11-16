@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('break_time_corrections', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('correction_request_id')->constrained()->cascadeOnDelete();
-            $table->time('break_start_time');
-            $table->time('break_end_time');
+            $table->time('break_start_time')->nullable();
+            $table->time('break_end_time')->nullable();
             $table->timestamps();
         });
     }

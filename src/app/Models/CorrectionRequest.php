@@ -12,7 +12,6 @@ class CorrectionRequest extends Model
     protected $fillable = [
         'user_id',
         'attendance_id',
-        'break_time_id',
         'work_date',
         'reason',
         'request_status'
@@ -21,11 +20,6 @@ class CorrectionRequest extends Model
     public function attendanceCorrection()
     {
         return $this->hasOne('App\Models\AttendanceCorrection');
-    }
-
-    public function breakTimeCorrection()
-    {
-        return $this->hasOne('App\Models\BreakTimeCorrection');
     }
 
     public function targetUser()

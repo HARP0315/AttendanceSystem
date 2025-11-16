@@ -16,11 +16,6 @@ class BreakTime extends Model
         'break_end_time'
     ];
 
-    public function breakCorrectionRequests()
-    {
-        return $this->hasMany('App\Models\CorrectionRequest');
-    }
-
     public function breakUser()
     {
         return $this->belongsTo('App\Models\User', 'user_id');

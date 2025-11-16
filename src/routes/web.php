@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StaffAttendanceController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\StaffAttendanceCorrectionController;
-use App\Http\Controllers\AdminCorrectionRequestController;
+use App\Http\Controllers\AdminAttendanceCorrectionController;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
 /*
@@ -24,7 +24,12 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 // ---------------------------
 Route::prefix('')->middleware(['auth','staff.verified'])->group(function () {
     Route::get('/attendance', [StaffAttendanceController::class, 'index'])->name('attendance.index');
-    // ここに他のスタッフページも追加
+    Route::post('/attendance', [StaffAttendanceController::class, 'store'])->name('attendance.store');
+    Route::get('/attendance/list', [StaffAttendanceController::class, 'monthlyAttendance'])->name('attendance.monthly');
+    Route::get('/attendance/detail/{attendance_id?}', [StaffAttendanceController::class, 'attendanceDetail'])->name('attendance.detail');
+    Route::post('/attendance/detail/{attendance_id?}', [StaffAttendanceController::class, 'correctionRequestCreate'])->name('correction.request');
+    Route::get('/stamp_correction_request/list', [StaffAttendanceController::class, 'requestList'])->name('attendance.corrections.requests');
+
 });
 
 // 登録画面（スタッフ用）

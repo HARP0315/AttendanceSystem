@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('correction_requests', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->constrained()->cascadeOnDelete();
-            $table->unsignedBigInteger('attendance_id')->constrained()->cascadeOnDelete();
-            $table->unsignedBigInteger('break_time_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('attendance_id')->nullable()->constrained()->onDelete('cascade');
             $table->date('work_date');
-            $table->string('reason',255)->nullable();
+            $table->string('reason',255);
             $table->tinyInteger('request_status'); // 0:承認待ち, 1: 承認済み,
             $table->timestamps();
         });
