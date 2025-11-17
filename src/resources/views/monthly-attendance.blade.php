@@ -29,16 +29,20 @@
         <th>出勤</th>
         <th>退勤</th>
         <th>休憩</th>
+        <th>合計</th>
         <th>詳細</th>
         @foreach($days as $day)
             <tr>
                 <td>{{ \Carbon\Carbon::parse($day['date'])->format('m/d') }}（{{ $day['day_jp'] }}）</td>
                 <td>{{ $day['work_start'] ?? '-' }}</td>
                 <td>{{ $day['work_end'] ?? '-' }}</td>
-                <td>{{ isset($day['break_total']) && $day['break_total'] > 0 ? floor($day['break_total']/60).':'.str_pad($day['break_total']%60, 2,'0',STR_PAD_LEFT) : '-' }}</td>
+                <td>
+                    {{ $day['break_total'] ?? '-' }}
+                </td>
+                <td>{{ $day['work_total'] ?? '-' }}</td>
                 <td>
                     @if($day['attendance'])
-                        <a href="{{ url('/attendance/detail/'.($day['attendance']->id)) }}">詳細</a>
+                        <a href="{{ url('/attendance/detail/'.($day['attendance']->id)) }}" >詳細</a>
                     @else
                         <a href="{{ url('/attendance/detail') }}?date={{ $day['date'] }}">詳細</a>
                     @endif

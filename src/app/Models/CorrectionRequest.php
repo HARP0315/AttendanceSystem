@@ -22,6 +22,11 @@ class CorrectionRequest extends Model
         return $this->hasOne('App\Models\AttendanceCorrection');
     }
 
+    public function breakTimeCorrections()
+    {
+        return $this->hasMany('App\Models\BreakTimeCorrection');
+    }
+
     public function targetUser()
     {
         return $this->belongsTo('App\Models\User', 'user_id');
@@ -32,8 +37,4 @@ class CorrectionRequest extends Model
         return $this->belongsTo('App\Models\Attendance', 'attendance_id');
     }
 
-    public function targetBreakTime()
-    {
-        return $this->belongsTo('App\Models\BreakTime', 'break_time_id');
-    }
 }

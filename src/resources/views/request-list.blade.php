@@ -14,7 +14,7 @@
 
 <div class="container">
     <div class="title-container">
-        <h1 class="title">勤怠一覧</h1>
+        <h1 class="title">申請一覧</h1>
     </div>
 
     <div class="tabs">

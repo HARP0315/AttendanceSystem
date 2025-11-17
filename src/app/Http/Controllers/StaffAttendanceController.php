@@ -108,17 +108,20 @@ class StaffAttendanceController extends Controller
         return back();
     }
 
+
     public function monthlyAttendance(Request $request)
     {
         // 表示する月を決める
-        $date = $request->query('month')? Carbon::createFromFormat('Y-m', $request->query('month')): Carbon::now();
+        $date = $request->query('month')
+        ? Carbon::createFromFormat('Y-m', $request->query('month'))
+        : Carbon::now();
 
         $startOfMonth = $date->copy()->startOfMonth();
         $endOfMonth   = $date->copy()->endOfMonth();
 
         // 当月の日付配列を作る
         $days = [];
-        for ($d = $startOfMonth->copy(); $d<=$endOfMonth; $d->addDay()) {
+        for ($d = $startOfMonth->copy(); $d <= $endOfMonth; $d->addDay()) {
             $days[$d->format('Y-m-d')] = [
                 'date' => $d->format('Y-m-d'),
                 'day_jp' => ['日','月','火','水','木','金','土'][$d->dayOfWeek],
@@ -128,31 +131,62 @@ class StaffAttendanceController extends Controller
 
         // 当月の勤怠情報を取得
         $attendances = Attendance::whereBetween('work_date', [$startOfMonth, $endOfMonth])
-                                ->with('breakRecords') // N+1対策
-                                ->get()
-                                ->keyBy('work_date'); // 日付でキーにする
+            ->with('breakRecords')
+            ->get()
+            ->keyBy('work_date');
 
-        // $daysにDBの勤怠情報を差し込む
+        // $days に DB 情報を差し込む
         foreach ($days as $dateStr => &$day) {
-            if(isset($attendances[$dateStr])) {
+            if (isset($attendances[$dateStr])) {
                 $attendance = $attendances[$dateStr];
-                $day['attendance'] = $attendance;
-                $day['work_start'] = $attendance->work_start_time ? Carbon::parse($attendance->work_start_time)->format('H:i') : null;
-                $day['work_end'] = $attendance->work_end_time ? Carbon::parse($attendance->work_end_time)->format('H:i') : null;
 
-                // 休憩合計
-                $day['break_total'] = $attendance->breakRecords
-                 ? $attendance->breakRecords->sum(function($b) {
-                    return $b->break_end_time && $b->break_start_time
-                        ? Carbon::parse($b->break_end_time)->diffInMinutes(Carbon::parse($b->break_start_time))
-                        : 0;
-                })
-                : 0;
+                // 勤怠時間
+                $workStart = $attendance->work_start_time ? Carbon::parse($attendance->work_start_time) : null;
+                $workEnd   = $attendance->work_end_time   ? Carbon::parse($attendance->work_end_time)   : null;
+
+                // 休憩合計（分）
+                $breakRecords = $attendance->breakRecords;
+
+                if ($breakRecords->isEmpty()) {
+                    $breakTotal = null;
+                } else {
+                    $breakTotal = $breakRecords->sum(function($b) {
+                        $start = Carbon::parse($b->break_start_time);
+                        $end   = Carbon::parse($b->break_end_time);
+                        if ($start && $end) {
+                            $seconds = $end->diffInSeconds($start);
+                            return ceil($seconds / 60); // 1分未満切り上げ
+                        }
+                        return 0;
+                    });
+                }
+
+
+                // 合計勤務時間（分）
+                $workTotal = ($workStart && $workEnd)
+                    ? ceil(
+                        (
+                            $workEnd->diffInSeconds($workStart)
+                            - $attendance->breakRecords->sum(fn($b) =>
+                                $b->break_start_time && $b->break_end_time
+                                    ? Carbon::parse($b->break_end_time)->diffInSeconds(Carbon::parse($b->break_start_time))
+                                    : 0
+                            )
+                        ) / 60
+                    )
+                    : null;
+
+                // 配列にまとめる
+                $day['attendance']  = $attendance;
+                $day['work_start']  = $workStart ? $workStart->format('H:i') : null;
+                $day['work_end']    = $workEnd ? $workEnd->format('H:i') : null;
+                $day['break_total'] = $breakTotal !== null ? sprintf('%02d:%02d', intdiv($workTotal, 60), $breakTotal % 60) : null;
+                $day['work_total']  = $workTotal !== null ? sprintf('%02d:%02d', intdiv($workTotal, 60), $workTotal % 60) : null;
 
             }
         }
 
-        //前月、翌月リンク用のデータを作成してビューに渡す
+        // 前月、翌月リンク用データ
         return view('monthly-attendance', [
             'days' => $days,
             'currentMonth' => $date,
@@ -165,35 +199,60 @@ class StaffAttendanceController extends Controller
     public function attendanceDetail(Request $request, $attendance_id = null)
     {
         $user = Auth::user();
+        $attendance = null;
+        $workDate = $request->query('date') ?? session('work_date');
 
+        // 既存勤怠がある場合
         if ($attendance_id) {
-            // 既存勤怠がある場合
-            $attendance = Attendance::with('breakRecords')->find($attendance_id);
-            $workDate = $attendance->work_date;
 
-        } else {
-            // 勤怠なしの場合
-            $attendance = null;
-            $workDate = $request->query('date') ?? session('work_date');
+            $attendance = Attendance::with('breakRecords','correctionRequests')
+                                    ->find($attendance_id);
+            $workDate = $attendance->work_date;
+        }
+
+        $correctionRequest = null;
+        $attendanceCorrection = null;
+        $breakCorrections = collect();
+
+        // もし勤怠があるなら、修正申請（status:0）を探す
+        if ($attendance) {
+            $correctionRequest = $attendance->correctionRequests()
+                                            ->where('request_status', 0)
+                                            ->latest()
+                                            ->with(['attendanceCorrection', 'breakTimeCorrections'])
+                                            ->first();
+        }
+
+        // 修正申請がある場合はそちらを優先
+        if ($correctionRequest) {
+
+            $attendanceCorrection = $correctionRequest->attendanceCorrection;
+            $breakCorrections = $correctionRequest->breakTimeCorrections;
+
+        } elseif ($attendance) {
+
+            // 修正申請がない or 承認済みの場合は勤怠データを使用
+            $attendanceCorrection = $attendance; // 勤怠本体の start/end 時間
+            $breakCorrections = $attendance->breakRecords;
+
         }
 
         // 次回アクセス用にセッションに保存
         session(['work_date' => $workDate]);
 
-        // 休憩レコード（勤怠がなければ空配列）
-        $breakRecords = $attendance ? $attendance->breakRecords : [];
-
-        return view('attendance-detail',compact(
-            'user',
-            'attendance',
-            'workDate',
-            'breakRecords'
-        ));
+        return view('attendance-detail', [
+            'user' => $user,
+            'attendance' => $attendance,
+            'workDate' => $workDate,
+            'attendanceCorrection' => $attendanceCorrection,
+            'breakCorrections' => $breakCorrections,
+            'correctionRequest' => $correctionRequest,
+        ]);
     }
 
-    public function correctionRequestCreate(AttendanceDetailRequest $request,$attendance_id = null)
-    {
 
+    public function correctionRequestCreate(AttendanceDetailRequest $request, $attendance_id = null)
+    {
         $user = Auth::user();
         $form = $request->validated();
         $form['attendance_id'] = $attendance_id;
@@ -201,13 +260,11 @@ class StaffAttendanceController extends Controller
         // work_date はフォームになければセッションから取得
         $workDate = $form['work_date'] ?? session('work_date');
 
-        //attendance_id が null の場合、勤怠情報が全て空欄ならエラー
+        // attendance_id が null の場合、勤怠情報が全て空欄ならエラー
         if (is_null($attendance_id)) {
-
             $allWorkNull = empty($form['work_start_time'])
                         && empty($form['work_end_time']);
 
-            //まず休憩時間はすべてnullであると仮定
             $allBreaksNull = true;
             foreach ($form['breaks'] ?? [] as $b) {
                 if (!empty($b['break_start_time']) || !empty($b['break_end_time'])) {
@@ -240,22 +297,27 @@ class StaffAttendanceController extends Controller
             'work_end_time' => $form['work_end_time'] ?? null,
         ]);
 
-        // 3. break_time_corrections 作成
+        // 3. break_time_corrections 作成（空欄スルー）
         $breaks = $form['breaks'] ?? [];
 
-        if (is_array(($breaks))) {
-            foreach($breaks as $break) {
+        foreach ($breaks as $break) {
+            $start = $break['break_start_time'] ?? null;
+            $end   = $break['break_end_time'] ?? null;
+
+            // 両方入力されている場合のみ作成
+            if ($start && $end) {
                 BreakTimeCorrection::create([
                     'user_id' => $user->id,
                     'correction_request_id' => $correctionRequest->id,
-                    'break_start_time' => $break['break_start_time'] ?? null,
-                    'break_end_time' => $break['break_end_time'] ?? null,
+                    'break_start_time' => $start,
+                    'break_end_time' => $end,
                 ]);
             }
         }
 
-        return back()->with('flashSuccess', '修正申請を送信しました。');
+        $backUrl = $request->input('back_url') ?? route('attendance.detail');
 
+        return redirect($backUrl)->with('flashSuccess', '修正申請を送信しました。');
     }
 
     public function requestList(){

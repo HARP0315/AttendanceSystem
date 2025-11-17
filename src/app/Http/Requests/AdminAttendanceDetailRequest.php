@@ -23,7 +23,36 @@ class AdminAttendanceDetailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'work_start_time' => [
+                'nullable',
+                // 'date_format:H:i',
+                // 'before:work_end_time',
+            ],
+            'work_end_time' => [
+                'nullable',
+                // 'date_format:H:i',
+                // 'after:work_start_time',
+            ],
+            'reason' => [
+                'nullable',
+                // 'required',
+                // 'string',
+                // 'max:255',
+            ],
+            'breaks' => ['array'],
+            'breaks.*.break_start_time' => [
+                'nullable',
+                'date_format:H:i',
+                // 'before:breaks.*.break_end_time',
+                // 'before:work_end_time',
+                // 'after:work_start_time',
+            ],
+            'breaks.*.break_end_time' => [
+                'nullable',
+                'date_format:H:i',
+                // 'before:work_end_time',
+                // 'after:breaks.*.break_start_time',
+            ],
         ];
     }
 }

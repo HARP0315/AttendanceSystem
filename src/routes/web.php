@@ -46,8 +46,15 @@ Route::prefix('')->middleware(['auth','staff.verified'])->group(function () {
 // 管理者用
 // ---------------------------
 Route::prefix('admin')->middleware(['auth'])->group(function () {
-    Route::get('/attendance/list', [AdminAttendanceController::class, 'index'])->name('admin.attendance.list');
-    // 他の管理者ページもここに追加
+    Route::get('/attendance/list', [AdminAttendanceController::class, 'dailyAttendance'])->name('admin.attendance.list');
+    Route::get('/attendance/{attendance_id?}', [AdminAttendanceController::class, 'attendanceDetail'])->name('admin.attendance.detail');
+    Route::post('/attendance/{attendance_id?}', [AdminAttendanceController::class, 'attendanceCorrectionUpdate'])->name('admin.attendance.detail');
+    Route::get('/staff/list', [AdminAttendanceController::class, 'staffList']);
+    Route::get('/attendance/staff/{id}', [AdminAttendanceController::class, 'monthlyAttendance'])->name('admin.monthly.attendance');
+    Route::get('/stamp_correction_request/list', [AdminAttendanceController::class, 'requestList'])->name('admin.correction.list');
+    Route::get('/stamp_correction_request/approve/{correction_request_id}', [AdminAttendanceController::class, 'approvalView']);
+    Route::post('/stamp_correction_request/approve/{correction_request_id}', [AdminAttendanceController::class, 'approvalUpdate']);
+
 });
 
 // 管理者ログイン画面
