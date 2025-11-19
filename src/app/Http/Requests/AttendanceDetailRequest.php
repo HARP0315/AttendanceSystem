@@ -22,80 +22,97 @@ class AttendanceDetailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'work_start_time' => [
-                'nullable',
-                // 'date_format:H:i',
-                // 'before:work_end_time',
-            ],
-            'work_end_time' => [
-                'nullable',
-                // 'date_format:H:i',
-                // 'after:work_start_time',
-            ],
-            'reason' => [
-                'nullable',
-                // 'required',
-                // 'string',
-                // 'max:255',
-            ],
-            'breaks' => ['array'],
-            'breaks.*.break_start_time' => [
-                'nullable',
-                'date_format:H:i',
-                // 'before:breaks.*.break_end_time',
-                // 'before:work_end_time',
-                // 'after:work_start_time',
-            ],
-            'breaks.*.break_end_time' => [
-                'nullable',
-                'date_format:H:i',
-                // 'before:work_end_time',
-                // 'after:breaks.*.break_start_time',
-            ],
+
+            'work_start_time' => ['nullable', 'date_format:H:i', 'required_with:work_end_time'],
+            'work_end_time'   => ['nullable', 'date_format:H:i', 'required_with:work_start_time'],
+
+            'breaks' => ['nullable', 'array'],
+            'breaks.*.break_start_time' => ['nullable', 'date_format:H:i'],
+            'breaks.*.break_end_time'   => ['nullable', 'date_format:H:i'],
+
+            'reason' => ['required', 'string', 'max:15'],
         ];
 
-        }
+    }
 
-    // public function withValidator($validator)
-    // {
-    //     $validator->after(function ($validator) {
-    //         $breaks = $this->input('breaks', []);
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $data   = $this->all();
+            $start  = $data['work_start_time'] ?? null;
+            $end    = $data['work_end_time'] ?? null;
+            $breaks = $data['breaks'] ?? [];
 
-    //         for ($i = 1; $i < count($breaks); $i++) {
-    //             $prevEnd = $breaks[$i - 1]['break_end_time'] ?? null;
-    //             $start = $breaks[$i]['break_start_time'] ?? null;
+            // ---------------------------------
+            // 出勤 < 退勤
+            // ---------------------------------
+            if ($start && $end && $start >= $end) {
+                $validator->errors()->add('work_start_time', '出勤時間が不適切な値です');
+            }
 
-    //             if ($prevEnd && $start && $start < $prevEnd) {
-    //                 $validator->errors()->add(
-    //                     "breaks.$i.break_start_time",
-    //                     '前の休憩終了時間より後である必要があります。'
-    //                 );
-    //             }
-    //         }
-    //     });
-    // }
+            //休憩時間の入力がある場合、出勤・退勤必須
+            if (!empty($breaks) && (!$start || !$end)) {
+                $validator->errors()->add('work_start_time', '出勤時間を入力してください');
+                $validator->errors()->add('work_end_time', '退勤時間を入力してください');
+            }
+
+            // ---------------------------------
+            // 休憩のチェック（必要最低限）
+            // ---------------------------------
+            $previousEnd = null;
+
+            foreach ($breaks as $i => $b) {
+                $bs = $b['break_start_time'] ?? null;
+                $be = $b['break_end_time'] ?? null;
+
+                // セット必須（開始 → 終了）
+                if ($be && !$bs) {
+                    $validator->errors()->add("breaks.$i.break_start_time", '休憩開始を入力してください');
+                }
+                if ($bs && !$be) {
+                    $validator->errors()->add("breaks.$i.break_end_time", '休憩終了を入力してください');
+                }
+
+                // 時間の前後関係
+                if ($bs && $be && $bs >= $be) {
+                    $validator->errors()->add("breaks.$i.break_end_time", '休憩時間が不適切な値です');
+                }
+
+                // 出勤～退勤の範囲
+                if ($start && $bs && $bs <= $start) {
+                    $validator->errors()->add("breaks.$i.break_start_time", '休憩時間が不適切な値です');
+                }
+                if ($end && $bs && $bs >= $end) {
+                    $validator->errors()->add("breaks.$i.break_start_time", '休憩時間が不適切な値です');
+                }
+                if ($end && $be && $be >= $end) {
+                    $validator->errors()->add("breaks.$i.break_end_time", '休憩時間もしくは退勤時間が不適切な値です');
+                }
+
+                // 連続チェック（前の休憩終了より後）
+                if ($previousEnd && $bs && $bs <= $previousEnd) {
+                    $validator->errors()->add("breaks.$i.break_start_time", '休憩時間が不適切な値です');
+                }
+
+                if ($be) {
+                    $previousEnd = $be;
+                }
+            }
+        });
+    }
 
     public function messages()
     {
         return [
-            // 'work_start_time.required' => '出勤時間を入力してください',
-            // 'work_start_time.date_format' => '時刻を入力してください',
-            // 'work_start_time.before' => '出勤時間もしくは退勤時間が不適切な値です',
-            // 'work_end_time.required' => '退勤時間を入力してください',
-            // 'work_end_time.date_format' => '時刻を入力してください',
-            // 'work_end_time.after' => '出勤時間もしくは退勤時間が不適切な値です',
-            // 'reason.required' => '備考を入力してください',
-            // 'reason.string' => '備考は文字列で入力してください',
-            // 'reason.max' => '備考は255文字以内で入力してください',
-            // 'breaks.0.break_start_time.required' => '休憩開始時間を入力してください',
-            // 'breaks.0.break_start_time.date_format' => '休憩開始時間は時刻で入力してください',
-            // 'breaks.0.break_start_time.before' => '休憩時間が不適切な値です',
-            // 'breaks.0.break_start_time.after' => '休憩時間が不適切な値です',
-            // 'breaks.0.break_after_time.required' => '休憩開始時間を入力してください',
-            // 'breaks.0.break_end_time.date_format' => '休憩終了時間は時刻で入力してください',
-            // 'breaks.*.break_end_time.before' => '休憩時間もしくは退勤時間が不適切な値です',
-            // 'breaks.*.break_end_time.after' => '休憩時間が不適切な値です',
-            // 'breaks.*.break_start_time.after' => '休憩時間もしくは出勤時間が不適切な値です',
+            'work_start_time.date_format' => '時間で入力してください',
+            'work_start_time.required_with' => '出勤時間を入れてください',
+            'work_end_time.date_format' => '時間で入力してください',
+            'work_end_time.required_with' => '退勤時間を入れてください',
+            'breaks.*.break_start_time.date_format' => '時間で入力してください',
+            'breaks.*.break_end_time.date_format' => '時間で入力してください',
+            'reason.required' => '備考を記入してください',
+            'reason.string' => '文字列で記入してください',
+            'reason.max' => '15文字以内で記入してください',
         ];
     }
 }
