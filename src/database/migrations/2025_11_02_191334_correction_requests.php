@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('attendance_id')->nullable()->constrained()->onDelete('cascade');
             $table->date('work_date');
             $table->string('reason',255);
-            $table->tinyInteger('request_status'); // 0:承認待ち, 1: 承認済み,
+            $table->tinyInteger('request_status'); // 1:承認待ち, 2: 承認済み,
             $table->timestamps();
         });
     }

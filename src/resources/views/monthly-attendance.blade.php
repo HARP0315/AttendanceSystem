@@ -34,12 +34,12 @@
         @foreach($days as $day)
             <tr>
                 <td>{{ \Carbon\Carbon::parse($day['date'])->format('m/d') }}（{{ $day['day_jp'] }}）</td>
-                <td>{{ $day['work_start'] ?? '-' }}</td>
-                <td>{{ $day['work_end'] ?? '-' }}</td>
+                <td>{{ $day['work_start'] ?? '' }}</td>
+                <td>{{ $day['work_end'] ?? '' }}</td>
                 <td>
-                    {{ $day['break_total'] ?? '-' }}
+                    {{ $day['break_total'] ?? '' }}
                 </td>
-                <td>{{ $day['work_total'] ?? '-' }}</td>
+                <td>{{ $day['work_total'] ?? '' }}</td>
                 <td>
                     @if($day['attendance'])
                         <a href="{{ url('/attendance/detail/'.($day['attendance']->id)) }}" >詳細</a>

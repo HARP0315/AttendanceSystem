@@ -47,10 +47,16 @@
                     <input type="time"
                         name="work_start_time"
                         value="{{ $attendance ? \Carbon\Carbon::parse($attendance->work_start_time)->format('H:i') : '' }}">
-                    <span>~</span>
+                    @error('work_start_time')
+                        <p class="error-message">{{ $message }}</p>
+                    @enderror
+                    <p>~</p>
                     <input type="time"
                         name="work_end_time"
                         value="{{ $attendance ? \Carbon\Carbon::parse($attendance->work_end_time)->format('H:i') : '' }}">
+                    @error('work_end_time')
+                        <p class="error-message">{{ $message }}</p>
+                    @enderror
                 </div>
             </td>
         </tr>
@@ -71,12 +77,18 @@
                     value="{{ is_object($break)
                                 ? ($break->break_start_time ? \Carbon\Carbon::parse($break->break_start_time)->format('H:i') : '')
                                 : ($break['break_start_time'] ? \Carbon\Carbon::parse($break['break_start_time'])->format('H:i') : '') }}">
-                <span>~</span>
+                @error("breaks.$index.break_start_time")
+                    <p class="error-message">{{ $message }}</p>
+                @enderror
+                <p>~</p>
                 <input type="time"
                     name="breaks[{{ $index }}][break_end_time]"
                     value="{{ is_object($break)
                                 ? ($break->break_end_time ? \Carbon\Carbon::parse($break->break_end_time)->format('H:i') : '')
                                 : ($break['break_end_time'] ? \Carbon\Carbon::parse($break['break_end_time'])->format('H:i') : '') }}">
+                @error("breaks.$index.break_end_time")
+                    <p class="error-message">{{ $message }}</p>
+                @enderror
             </td>
         </tr>
         @endforeach
@@ -89,6 +101,9 @@
                 <input type="text"
                     name="reason"
                     value="{{ $attendance ? ($attendance->reason ?? '') : '' }}">
+                @error('reason')
+                    <p class="error-message">{{ $message }}</p>
+                @enderror
             </td>
         </tr>
 

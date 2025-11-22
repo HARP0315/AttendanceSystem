@@ -16,10 +16,10 @@ class BreakTime extends Model
         'break_end_time'
     ];
 
-    public function breakUser()
-    {
-        return $this->belongsTo('App\Models\User', 'user_id');
-    }
+    // public function breakUser()
+    // {
+    //     return $this->belongsTo('App\Models\User', 'user_id');
+    // }
 
     public function attendance()
     {

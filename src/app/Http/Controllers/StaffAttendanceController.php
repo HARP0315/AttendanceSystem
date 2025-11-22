@@ -26,6 +26,7 @@ class StaffAttendanceController extends Controller
 
         $attendance = Attendance::where('user_id', $userId)
                                 ->where('work_date', $today)
+                                ->where('is_deleted', '!=', 1)
                                 ->first();
 
         return view('attendance', compact('attendance'));
@@ -40,6 +41,7 @@ class StaffAttendanceController extends Controller
 
         $attendance = Attendance::where('user_id', $userId)
                                 ->where('work_date', $today)
+                                ->where('is_deleted', '!=', 1)
                                 ->first();
 
         //出勤
@@ -104,7 +106,6 @@ class StaffAttendanceController extends Controller
             return back();
         }
 
-
         return back();
     }
 
@@ -130,10 +131,11 @@ class StaffAttendanceController extends Controller
         }
 
         // 当月の勤怠情報を取得
-        $attendances = Attendance::whereBetween('work_date', [$startOfMonth, $endOfMonth])
-            ->with('breakRecords')
-            ->get()
-            ->keyBy('work_date');
+        $attendances = Attendance::where('is_deleted', '!=', 1)
+                                ->whereBetween('work_date', [$startOfMonth, $endOfMonth])
+                                ->with('breakRecords')
+                                ->get()
+                                ->keyBy('work_date');
 
         // $days に DB 情報を差し込む
         foreach ($days as $dateStr => &$day) {
@@ -160,7 +162,6 @@ class StaffAttendanceController extends Controller
                         return 0;
                     });
                 }
-
 
                 // 合計勤務時間（分）
                 $workTotal = ($workStart && $workEnd)
@@ -205,8 +206,14 @@ class StaffAttendanceController extends Controller
         // 既存勤怠がある場合
         if ($attendance_id) {
 
-            $attendance = Attendance::with('breakRecords','correctionRequests')
+            $attendance = Attendance::where('is_deleted', '!=', 1)
+                                    ->with('breakRecords','correctionRequests')
                                     ->find($attendance_id);
+
+            if (!$attendance) {
+                return back();
+            }
+
             $workDate = $attendance->work_date;
         }
 
@@ -214,10 +221,10 @@ class StaffAttendanceController extends Controller
         $attendanceCorrection = null;
         $breakCorrections = collect();
 
-        // もし勤怠があるなら、修正申請（status:0）を探す
+        // もし勤怠があるなら、修正申請（status:1）を探す
         if ($attendance) {
             $correctionRequest = $attendance->correctionRequests()
-                                            ->where('request_status', 0)
+                                            ->where('request_status', 1)
                                             ->latest()
                                             ->with(['attendanceCorrection', 'breakTimeCorrections'])
                                             ->first();
@@ -255,7 +262,21 @@ class StaffAttendanceController extends Controller
     {
         $user = Auth::user();
         $form = $request->validated();
-        $form['attendance_id'] = $attendance_id;
+
+        // attendance_id がある場合は、自分の勤怠か確認する
+        if ($attendance_id) {
+            $attendance = Attendance::where('id', $attendance_id)
+                                    ->where('user_id', $user->id)
+                                    ->where('is_deleted', '!=', 1)
+                                    ->first();
+
+            if (!$attendance) {
+                // 存在しない、もしくは自分以外の勤怠なら戻す
+                return back();
+            }
+
+            $form['attendance_id'] = $attendance->id;
+        }
 
         // work_date はフォームになければセッションから取得
         $workDate = $form['work_date'] ?? session('work_date');
@@ -286,7 +307,7 @@ class StaffAttendanceController extends Controller
             'attendance_id' => $form['attendance_id'] ?? null,
             'work_date' => $workDate,
             'reason' => $form['reason'],
-            'request_status' => 0, // 承認待ち
+            'request_status' => 1, // 承認待ち
         ]);
 
         // 2. attendance_corrections 作成
@@ -325,13 +346,13 @@ class StaffAttendanceController extends Controller
         $userId = Auth::id();
 
         $pendingRequests = CorrectionRequest::where('user_id', $userId)
-            ->where('request_status', 0)
+            ->where('request_status', 1)
             ->with('targetUser')
             ->orderBy('created_at', 'desc')
             ->get();
 
         $approvedRequests = CorrectionRequest::where('user_id', $userId)
-            ->where('request_status', 1)
+            ->where('request_status', 2)
             ->with('targetUser')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -339,6 +360,5 @@ class StaffAttendanceController extends Controller
         return view('request-list', compact('pendingRequests','approvedRequests'));
 
     }
-
 
 }

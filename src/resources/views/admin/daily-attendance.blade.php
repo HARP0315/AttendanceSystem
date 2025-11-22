@@ -38,10 +38,10 @@
         @foreach($attendances as $attendance)
             <tr>
                 <td>{{ $attendance['user']->name }}</td>
-                <td>{{ $attendance['work_start'] ?? '-' }}</td>
-                <td>{{ $attendance['work_end'] ?? '-' }}</td>
-                <td>{{ $attendance['break_total'] ?? '-' }}</td>
-                <td>{{ $attendance['work_total'] ?? '-' }}</td>
+                <td>{{ $attendance['work_start'] ?? '' }}</td>
+                <td>{{ $attendance['work_end'] ?? '' }}</td>
+                <td>{{ $attendance['break_total'] ?? '' }}</td>
+                <td>{{ $attendance['work_total'] ?? '' }}</td>
                 <td>
                     @if($attendance['attendance'])
                         <a href="{{ url('admin/attendance/'.($attendance['attendance']->id)) }}">詳細</a>

@@ -31,6 +31,7 @@ class AttendanceDetailRequest extends FormRequest
             'breaks.*.break_end_time'   => ['nullable', 'date_format:H:i'],
 
             'reason' => ['required', 'string', 'max:15'],
+            'is_deleted' => ['nullable'],
         ];
 
     }
@@ -52,8 +53,8 @@ class AttendanceDetailRequest extends FormRequest
 
             //休憩時間の入力がある場合、出勤・退勤必須
             if (!empty($breaks) && (!$start || !$end)) {
-                $validator->errors()->add('work_start_time', '出勤時間を入力してください');
-                $validator->errors()->add('work_end_time', '退勤時間を入力してください');
+                $validator->errors()->add('work_start_time', '出勤・退勤の両方を入力してください');
+                $validator->errors()->add('work_end_time', '出勤・退勤の両方を入力してください');
             }
 
             // ---------------------------------

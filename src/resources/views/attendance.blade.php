@@ -14,13 +14,15 @@
 
 <div class="container">
     @php
-        $today = now()->format('Y年m月d日 (D)');
+        $w = ['日','月','火','水','木','金','土'];
+        $today = now();
+        $todayStr = $today->format('Y年m月d日') . ' (' . $w[$today->dayOfWeek] . ')';
     @endphp
 
     {{-- 勤務外 --}}
     @if(!$attendance || $attendance->status == 0)
         <div>勤務外</div>
-        <p class="">{{ $today }}</p>
+        <p class="">{{ $todayStr }}</p>
         <p id="clock"></p>
         <form action="/attendance" method="post">
             @csrf
@@ -30,7 +32,7 @@
     {{-- 出勤中 --}}
     @elseif ($attendance->status == 1)
         <div>出勤中</div>
-        <p class="">{{ $today }}</p>
+        <p class="">{{ $todayStr }}</p>
         <p id="clock"></p>
         <form action="/attendance" method="post">
             @csrf
@@ -41,7 +43,7 @@
     {{-- 休憩中 --}}
     @elseif ($attendance->status == 2)
         <div>休憩中</div>
-        <p class="">{{ $today }}</p>
+        <p class="">{{ $todayStr }}</p>
         <p id="clock"></p>
         <form action="/attendance" method="post">
             @csrf
@@ -51,7 +53,7 @@
     {{-- 退勤済 --}}
     @elseif ($attendance->status == 3)
         <div>退勤済</div>
-        <p class="">{{ $today }}</p>
+        <p class="">{{ $todayStr }}</p>
         <p id="clock"></p>
         <p>お疲れ様でした。</p>
     @endif
