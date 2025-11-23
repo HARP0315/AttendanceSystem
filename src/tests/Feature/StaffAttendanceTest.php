@@ -16,7 +16,8 @@ class StaffAttendanceTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * 現在の日時情報がUIと同じ形式で出力されている
+     * 日時取得機能 関連のテスト
+     * 【test】 現在の日時情報がUIと同じ形式で出力されている
      * @return void
      */
     public function test_attendance_page_shows_current_date()
@@ -29,7 +30,7 @@ class StaffAttendanceTest extends TestCase
         $response = $this->get('/attendance');
         $response->assertStatus(200);
 
-        // 現在日時を作成
+        //【check】 画面上に表示されている日時が現在の日時と一致する
         $w = ['日','月','火','水','木','金','土'];
         $today = now();
         $todayStr = $today->format('Y年m月d日') . ' (' . $w[$today->dayOfWeek] . ')';
