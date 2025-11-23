@@ -20,7 +20,7 @@
     @endphp
 
     {{-- 勤務外 --}}
-    @if(!$attendance || $attendance->status == 0)
+    @if(!$attendance)
         <div>勤務外</div>
         <p class="">{{ $todayStr }}</p>
         <p id="clock"></p>

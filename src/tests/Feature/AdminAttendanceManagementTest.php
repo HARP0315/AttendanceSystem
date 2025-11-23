@@ -8,6 +8,9 @@ use Tests\TestCase;
 
 class AdminAttendanceManagementTest extends TestCase
 {
+
+    use RefreshDatabase;
+
     /**
      * A basic feature test example.
      */

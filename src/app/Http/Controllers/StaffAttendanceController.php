@@ -181,7 +181,7 @@ class StaffAttendanceController extends Controller
                 $day['attendance']  = $attendance;
                 $day['work_start']  = $workStart ? $workStart->format('H:i') : null;
                 $day['work_end']    = $workEnd ? $workEnd->format('H:i') : null;
-                $day['break_total'] = $breakTotal !== null ? sprintf('%02d:%02d', intdiv($workTotal, 60), $breakTotal % 60) : null;
+                $day['break_total'] = $breakTotal !== null ? sprintf('%02d:%02d', intdiv($breakTotal, 60), $breakTotal % 60) : null;
                 $day['work_total']  = $workTotal !== null ? sprintf('%02d:%02d', intdiv($workTotal, 60), $workTotal % 60) : null;
 
             }
