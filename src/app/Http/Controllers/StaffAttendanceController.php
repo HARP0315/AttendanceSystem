@@ -30,6 +30,7 @@ class StaffAttendanceController extends Controller
                                 ->first();
 
         return view('attendance', compact('attendance'));
+
     }
 
     public function store(Request $request)
@@ -74,7 +75,6 @@ class StaffAttendanceController extends Controller
             if ($attendance) {
                 BreakTime::create([
                     'attendance_id'    => $attendance->id,
-                    'user_id'          => $userId,
                     'break_start_time' => Carbon::now(),
                 ]);
 
@@ -276,6 +276,7 @@ class StaffAttendanceController extends Controller
             }
 
             $form['attendance_id'] = $attendance->id;
+            $form['work_date'] = $attendance->work_date;
         }
 
         // work_date はフォームになければセッションから取得

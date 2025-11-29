@@ -16,11 +16,11 @@
     <h1 class="title">{{$user->name}}さんの勤怠一覧</h1>
 </div>
 <div class="container">
-    <form method="get" action="{{ url('admin/attendance/list/{user_id}') }}">
-        <a href="{{ url('admin/attendance/list/{user_id}?month='.$prevMonth) }}"><i class="fa-solid fa-arrow-left"></i><span>前月</span></a>
+    <form method="get" action="{{ url('admin/attendance/staff/'.$user->id) }}">
+        <a href="{{ url('admin/attendance/staff/'.$user->id.'?month='.$prevMonth)}}"><i class="fa-solid fa-arrow-left"></i><span>前月</span></a>
         <input type="month" name="month" value="{{ $currentMonth->format('Y-m') }}">
         <button type="submit">移動</button>
-        <a href="{{ url('admin/attendance/list/{user_id}?month='.$nextMonth) }}"><span>翌月</span><i class="fa-solid fa-arrow-right"></i></a>
+        <a href="{{ url('admin/attendance/staff/'.$user->id.'?month='.$nextMonth) }}"><span>翌月</span><i class="fa-solid fa-arrow-right"></i></a>
     </form>
 
     <table>
@@ -52,8 +52,3 @@
     </table>
 </div>
 @endsection
-
-<form action="/logout" method="post">
-@csrf
-    <button class="header__logout">ログアウト</button>
-</form>

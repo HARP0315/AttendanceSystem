@@ -49,7 +49,7 @@ class AdminAttendanceDetailRequest extends FormRequest
             // 出勤 < 退勤
             // ---------------------------------
             if ($start && $end && $start >= $end) {
-                $validator->errors()->add('work_start_time', '出勤時間が不適切な値です');
+                $validator->errors()->add('work_start_time', '出勤時間もしくは退勤時間が不適切な値です');
             }
 
             //休憩時間の入力がある場合、出勤・退勤必須

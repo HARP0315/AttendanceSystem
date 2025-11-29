@@ -40,7 +40,7 @@
                         <td>承認待ち</td>
                         <td>{{ $req->targetUser->name }}</td>
                         <td>{{ \Carbon\Carbon::parse($req->work_date)->format('Y/m/d') }}</td>
-                        <td>{{ \Illuminate\Support\Str::limit($req->reason, 5, '…') }}</td>
+                        <td>{{ $req->reason }}</td>
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
                         <td>
                                 <a href="{{ url('admin/stamp_correction_request/approve/'.$req->id) }}">詳細</a>
@@ -69,7 +69,7 @@
                         <td>承認済み</td>
                         <td>{{ $req->targetUser->name }}</td>
                         <td>{{ \Carbon\Carbon::parse($req->work_date)->format('Y/m/d') }}</td>
-                        <td>{{ \Illuminate\Support\Str::limit($req->reason, 5, '…') }}</td>
+                        <td>{{ $req->reason }}</td>
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
                         <td>
                             <a href="{{ url('/stamp_correction_request/approve/'.$req->id)}}">詳細</a>
@@ -104,8 +104,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </style>
 
 @endsection
-
-<form action="/logout" method="post">
-@csrf
-    <button class="header__logout">ログアウト</button>
-</form>

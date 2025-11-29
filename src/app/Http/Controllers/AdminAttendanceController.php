@@ -6,9 +6,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Attendance;
-use App\Models\BreakTime;
 use App\Models\CorrectionRequest;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AdminAttendanceDetailRequest;
 
 class AdminAttendanceController extends Controller
@@ -230,7 +228,6 @@ class AdminAttendanceController extends Controller
 
                 if ($start && $end) {
                     $attendance->breakRecords()->create([
-                        'user_id' => $user->id,
                         'break_start_time' => $start,
                         'break_end_time'   => $end,
                     ]);
@@ -446,7 +443,6 @@ class AdminAttendanceController extends Controller
                 $end   = $b->break_end_time;
 
                 $attendance->breakRecords()->create([
-                    'user_id' => $user->id,
                     'break_start_time' => $start,
                     'break_end_time'   => $end,
                 ]);
@@ -466,7 +462,6 @@ class AdminAttendanceController extends Controller
 
             foreach ($breakCorrections as $b) {
                 $attendance->breakRecords()->create([
-                    'user_id' => $user->id,
                     'attendance_id' => $attendance->id,
                     'break_start_time' => $b->break_start_time,
                     'break_end_time'   => $b->break_end_time,

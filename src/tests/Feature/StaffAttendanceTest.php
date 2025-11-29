@@ -79,7 +79,7 @@ class StaffAttendanceTest extends TestCase
         $attendance->update([
             'status' => 3,
             'work_end_time' => '18:00:00'
-    ]);
+        ]);
         $response = $this->get('/attendance');
 
         //検証

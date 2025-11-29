@@ -1,3 +1,4 @@
+@include('components.header')
 <form action="/login" method="post" class="authenticate center">
     @csrf
     <h1 class="page__title">ログイン</h1>

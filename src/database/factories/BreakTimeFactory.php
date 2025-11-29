@@ -21,7 +21,7 @@ class BreakTimeFactory extends Factory
     public function definition(): array
     {
         $startTime = $this->faker->time('H:i:s', '13:00:00');
-        $endTime = date('H:i:s', '14:00:00');
+        $endTime = $this->faker->time('H:i:s', '14:00:00');
 
         return [
             'attendance_id' => Attendance::factory(),
