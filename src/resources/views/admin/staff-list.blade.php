@@ -34,7 +34,7 @@
     </table>
     {{-- ページネーションリンク --}}
     <div class="pagination">
-        {{ $users->links() }}
+        {{ $users->links('vendor.pagination.custom') }}
     </div>
 </div>
 @endsection
