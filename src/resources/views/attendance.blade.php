@@ -5,14 +5,14 @@
 
 <!-- css -->
 @section('css')
-<link rel="stylesheet" href="{{ asset('')  }}">
+<link rel="stylesheet" href="{{ asset('/css/attendance.css')  }}">
 @endsection
 
 <!-- 本体 -->
 @section('content')
 @include('components.header')
 
-<div class="container">
+<div class="container center">
     @php
         $w = ['日','月','火','水','木','金','土'];
         $today = now();
@@ -21,41 +21,41 @@
 
     {{-- 勤務外 --}}
     @if(!$attendance)
-        <div>勤務外</div>
-        <p class="">{{ $todayStr }}</p>
+        <div class=attendance__status>勤務外</div>
+        <p class="date">{{ $todayStr }}</p>
         <p id="clock"></p>
         <form action="/attendance" method="post">
             @csrf
-            <button name="action" value="work_start" class="btn">出勤</button>
+            <button name="action" value="work_start" class="attendance__btn">出勤</button>
         </form>
 
     {{-- 出勤中 --}}
     @elseif ($attendance->status == 1)
-        <div>出勤中</div>
-        <p class="">{{ $todayStr }}</p>
+        <div class=attendance__status>出勤中</div>
+        <p class="date">{{ $todayStr }}</p>
         <p id="clock"></p>
         <form action="/attendance" method="post">
             @csrf
-            <button name="action" value="work_end" class="btn">退勤</button>
-            <button name="action" value="break_start" class="btn">休憩入</button>
+            <button name="action" value="work_end" class="attendance__btn">退勤</button>
+            <button name="action" value="break_start" class="attendance__btn btn--white">休憩入</button>
         </form>
 
     {{-- 休憩中 --}}
     @elseif ($attendance->status == 2)
-        <div>休憩中</div>
-        <p class="">{{ $todayStr }}</p>
+        <div class=attendance__status>休憩中</div>
+        <p class="date">{{ $todayStr }}</p>
         <p id="clock"></p>
         <form action="/attendance" method="post">
             @csrf
-            <button name="action" value="break_end" class="btn">休憩戻</button>
+            <button name="action" value="break_end" class="attendance__btn btn--white">休憩戻</button>
         </form>
 
     {{-- 退勤済 --}}
     @elseif ($attendance->status == 3)
-        <div>退勤済</div>
-        <p class="">{{ $todayStr }}</p>
+        <div class=attendance__status>退勤済</div>
+        <p class="date">{{ $todayStr }}</p>
         <p id="clock"></p>
-        <p>お疲れ様でした。</p>
+        <p class="work-end__massage">お疲れ様でした。</p>
     @endif
 </div>
 

@@ -12,10 +12,10 @@
 @section('content')
 @include('components.header')
 
-<div class="title-container">
-    <h1 class="title">{{$user->name}}さんの勤怠一覧</h1>
-</div>
-<div class="container">
+<div class="container center">
+    <div class="title-container">
+        <h1 class="page__title">{{$user->name}}さんの勤怠一覧</h1>
+    </div>
     <form method="get" action="{{ url('admin/attendance/staff/'.$user->id) }}">
         <a href="{{ url('admin/attendance/staff/'.$user->id.'?month='.$prevMonth)}}"><i class="fa-solid fa-arrow-left"></i><span>前月</span></a>
         <input type="month" name="month" value="{{ $currentMonth->format('Y-m') }}">
@@ -50,5 +50,10 @@
             </tr>
         @endforeach
     </table>
+    <form action="{{ url('admin/attendance/staff/export/' . $user->id) }}" method="post">
+        @csrf
+        <input class="submit__button export__btn" type="submit" value="CSV出力">
+        <input type="hidden" name="month" value="{{ $currentMonth->format('Y-m') }}">
+    </form>
 </div>
 @endsection

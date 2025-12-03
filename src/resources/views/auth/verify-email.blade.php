@@ -1,3 +1,11 @@
+@extends('layouts.default')
+
+@section('css')
+<link rel="stylesheet" href="{{ asset('/css/verify.css')  }}">
+@endsection
+
+@section('content')
+
 <div class="verify-email">
         <div class="verify-email__inner">
             <p class="verify-email__inner-message">

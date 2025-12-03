@@ -12,9 +12,9 @@
 @section('content')
 @include('components.header')
 
-<div class="container">
+<div class="container center">
     <div class="title-container">
-        <h1 class="title">申請一覧</h1>
+        <h1 class="page__title">申請一覧</h1>
     </div>
 
     <div class="tabs">
@@ -72,7 +72,7 @@
                         <td>{{ $req->reason }}</td>
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
                         <td>
-                            <a href="{{ url('/stamp_correction_request/approve/'.$req->id)}}">詳細</a>
+                            <a href="{{ url('admin/stamp_correction_request/approve/'.$req->id)}}">詳細</a>
                         </td>
                     </tr>
                 @endforeach

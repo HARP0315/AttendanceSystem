@@ -26,7 +26,7 @@ class StaffAttendanceController extends Controller
 
         $attendance = Attendance::where('user_id', $userId)
                                 ->where('work_date', $today)
-                                ->where('is_deleted', '!=', 1)
+                                ->where('is_deleted', '=', 0)
                                 ->first();
 
         return view('attendance', compact('attendance'));
@@ -42,7 +42,7 @@ class StaffAttendanceController extends Controller
 
         $attendance = Attendance::where('user_id', $userId)
                                 ->where('work_date', $today)
-                                ->where('is_deleted', '!=', 1)
+                                ->where('is_deleted', '=', 0)
                                 ->first();
 
         //出勤
@@ -112,10 +112,12 @@ class StaffAttendanceController extends Controller
 
     public function monthlyAttendance(Request $request)
     {
+        $userId = Auth::id();
+
         // 表示する月を決める
         $date = $request->query('month')
-        ? Carbon::createFromFormat('Y-m', $request->query('month'))
-        : Carbon::now();
+        ? Carbon::parse($request->query('month'))->startOfMonth()
+        : Carbon::now()->startOfMonth();
 
         $startOfMonth = $date->copy()->startOfMonth();
         $endOfMonth   = $date->copy()->endOfMonth();
@@ -131,7 +133,8 @@ class StaffAttendanceController extends Controller
         }
 
         // 当月の勤怠情報を取得
-        $attendances = Attendance::where('is_deleted', '!=', 1)
+        $attendances = Attendance::where('user_id', $userId)
+                                ->where('is_deleted', '=', 0)
                                 ->whereBetween('work_date', [$startOfMonth, $endOfMonth])
                                 ->with('breakRecords')
                                 ->get()
@@ -191,8 +194,8 @@ class StaffAttendanceController extends Controller
         return view('monthly-attendance', [
             'days' => $days,
             'currentMonth' => $date,
-            'prevMonth' => $date->copy()->subMonth()->format('Y-m'),
-            'nextMonth' => $date->copy()->addMonth()->format('Y-m'),
+            'prevMonth' => $date->copy()->subMonthNoOverflow()->format('Y-m'),
+            'nextMonth' => $date->copy()->addMonthNoOverflow()->format('Y-m'),
         ]);
 
     }
@@ -206,7 +209,8 @@ class StaffAttendanceController extends Controller
         // 既存勤怠がある場合
         if ($attendance_id) {
 
-            $attendance = Attendance::where('is_deleted', '!=', 1)
+            $attendance = Attendance::where('user_id', $user->id)
+                                    ->where('is_deleted', '=', 0)
                                     ->with('breakRecords','correctionRequests')
                                     ->find($attendance_id);
 
@@ -219,7 +223,8 @@ class StaffAttendanceController extends Controller
 
         $correctionRequest = null;
         $attendanceCorrection = null;
-        $breakCorrections = collect();
+        $breakRecords = [];
+        $breakCorrections = [];
 
         // もし勤怠があるなら、修正申請（status:1）を探す
         if ($attendance) {
@@ -228,6 +233,15 @@ class StaffAttendanceController extends Controller
                                             ->latest()
                                             ->with(['attendanceCorrection', 'breakTimeCorrections'])
                                             ->first();
+        }
+
+        if (!$attendance_id){
+            $correctionRequest = CorrectionRequest::where('user_id', $user->id)
+                                                ->where('work_date', $workDate)
+                                                ->where('request_status', 1)
+                                                ->latest()
+                                                ->with(['attendanceCorrection', 'breakTimeCorrections'])
+                                                ->first();
         }
 
         // 修正申請がある場合はそちらを優先
@@ -239,8 +253,7 @@ class StaffAttendanceController extends Controller
         } elseif ($attendance) {
 
             // 修正申請がない or 承認済みの場合は勤怠データを使用
-            $attendanceCorrection = $attendance; // 勤怠本体の start/end 時間
-            $breakCorrections = $attendance->breakRecords;
+            $breakRecords = $attendance->breakRecords ?? [];
 
         }
 
@@ -250,6 +263,7 @@ class StaffAttendanceController extends Controller
         return view('attendance-detail', [
             'user' => $user,
             'attendance' => $attendance,
+            'breakRecords' => $breakRecords,
             'workDate' => $workDate,
             'attendanceCorrection' => $attendanceCorrection,
             'breakCorrections' => $breakCorrections,
@@ -257,17 +271,16 @@ class StaffAttendanceController extends Controller
         ]);
     }
 
-
     public function correctionRequestCreate(AttendanceDetailRequest $request, $attendance_id = null)
     {
-        $user = Auth::user();
+        $userId = Auth::id();
         $form = $request->validated();
 
         // attendance_id がある場合は、自分の勤怠か確認する
         if ($attendance_id) {
             $attendance = Attendance::where('id', $attendance_id)
-                                    ->where('user_id', $user->id)
-                                    ->where('is_deleted', '!=', 1)
+                                    ->where('user_id', $userId)
+                                    ->where('is_deleted', '=', 0)
                                     ->first();
 
             if (!$attendance) {
@@ -304,7 +317,7 @@ class StaffAttendanceController extends Controller
 
         // 1. correction_requests 作成
         $correctionRequest = CorrectionRequest::create([
-            'user_id' => $user->id,
+            'user_id' => $userId,
             'attendance_id' => $form['attendance_id'] ?? null,
             'work_date' => $workDate,
             'reason' => $form['reason'],
@@ -313,7 +326,7 @@ class StaffAttendanceController extends Controller
 
         // 2. attendance_corrections 作成
         AttendanceCorrection::create([
-            'user_id' => $user->id,
+            'user_id' => $userId,
             'correction_request_id' => $correctionRequest->id,
             'work_start_time' => $form['work_start_time'] ?? null,
             'work_end_time' => $form['work_end_time'] ?? null,
@@ -329,7 +342,7 @@ class StaffAttendanceController extends Controller
             // 両方入力されている場合のみ作成
             if ($start && $end) {
                 BreakTimeCorrection::create([
-                    'user_id' => $user->id,
+                    'user_id' => $userId,
                     'correction_request_id' => $correctionRequest->id,
                     'break_start_time' => $start,
                     'break_end_time' => $end,

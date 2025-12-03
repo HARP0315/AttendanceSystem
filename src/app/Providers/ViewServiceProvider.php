@@ -31,6 +31,7 @@ class ViewServiceProvider extends ServiceProvider
                 $today = Carbon::today()->toDateString();
                 $headerLink = Attendance::where('user_id', $user->id)
                                         ->where('work_date', $today)
+                                        ->where('status','=',3)
                                         ->where('is_deleted', '!=', 1)
                                         ->first();
             }

@@ -29,7 +29,7 @@ class AdminAttendanceController extends Controller
             // ユーザーの該当日の勤怠
             $attendance = Attendance::where('user_id', $user->id)
                 ->where('work_date', $currentDay->format('Y-m-d'))
-                ->where('is_deleted', '!=', 1)  // 削除済みは除外
+                ->where('is_deleted', '=', 0)  // 削除済みは除外
                 ->with('breakRecords')
                 ->first();
 
@@ -94,8 +94,9 @@ class AdminAttendanceController extends Controller
 
         if ($attendance_id) {
             // 既存勤怠がある場合
-            $attendance = Attendance::where('is_deleted', '!=', 1)
-                                    ->with('breakRecords')->find($attendance_id);
+            $attendance = Attendance::where('is_deleted', '=', 0)
+                                    ->with('breakRecords')
+                                    ->find($attendance_id);
 
             if (!$attendance) {
                 return back();
@@ -139,7 +140,7 @@ class AdminAttendanceController extends Controller
 
         if ($attendance_id) {
             // 既存勤怠を取得
-            $attendance = Attendance::where('is_deleted', '!=', 1)
+            $attendance = Attendance::where('is_deleted', '=', 0)
                                     ->find($attendance_id);
 
             if (!$attendance) {
@@ -184,7 +185,6 @@ class AdminAttendanceController extends Controller
 
                 if ($start && $end) {
                     $attendance->breakRecords()->create([
-                        'user_id' => $user->id,
                         'break_start_time' => $start,
                         'break_end_time'   => $end,
                     ]);
@@ -239,6 +239,12 @@ class AdminAttendanceController extends Controller
         return redirect($backUrl)->with('flashSuccess', '勤怠情報を更新しました。');
     }
 
+    private function formatMinutes($minutes)
+    {
+        if ($minutes === null) return '';
+            return sprintf('%02d:%02d', intdiv($minutes, 60), $minutes % 60);
+    }
+
     public function monthlyAttendance(Request $request,$user_id)
     {
         $user = User::where('role',1)
@@ -251,8 +257,8 @@ class AdminAttendanceController extends Controller
 
             // 表示する月を決める
             $date = $request->query('month')
-            ? Carbon::createFromFormat('Y-m', $request->query('month'))
-            : Carbon::now();
+            ? Carbon::parse( $request->query('month'))->startOfMonth()
+            : Carbon::now()->startOfMonth();
 
             $startOfMonth = $date->copy()->startOfMonth();
             $endOfMonth   = $date->copy()->endOfMonth();
@@ -269,7 +275,7 @@ class AdminAttendanceController extends Controller
 
             // 当月の勤怠情報を取得
             $attendances = Attendance::where('user_id',$user_id)
-                ->where('is_deleted', '!=', 1)
+                ->where('is_deleted', '=', 0)
                 ->whereBetween('work_date', [$startOfMonth, $endOfMonth])
                 ->with('breakRecords')
                 ->get()
@@ -319,8 +325,8 @@ class AdminAttendanceController extends Controller
                     $day['attendance']  = $attendance;
                     $day['work_start']  = $workStart ? $workStart->format('H:i') : null;
                     $day['work_end']    = $workEnd ? $workEnd->format('H:i') : null;
-                    $day['break_total'] = $breakTotal !== null ? sprintf('%02d:%02d', intdiv($breakTotal, 60), $breakTotal % 60) : null;
-                    $day['work_total']  = $workTotal !== null ? sprintf('%02d:%02d', intdiv($workTotal, 60), $workTotal % 60) : null;
+                    $day['break_total'] = $this->formatMinutes($breakTotal);
+                    $day['work_total']  = $this->formatMinutes($workTotal);
 
                 }
             }
@@ -334,8 +340,8 @@ class AdminAttendanceController extends Controller
                 'user' => $user,
                 'days' => $days,
                 'currentMonth' => $date,
-                'prevMonth' => $date->copy()->subMonth()->format('Y-m'),
-                'nextMonth' => $date->copy()->addMonth()->format('Y-m'),
+                'prevMonth' => $date->copy()->subMonthNoOverflow()->format('Y-m'),
+                'nextMonth' => $date->copy()->addMonthNoOverflow()->format('Y-m'),
             ]);
         }
     }
@@ -387,6 +393,7 @@ class AdminAttendanceController extends Controller
 
     public function approvalUpdate($correction_request_id)
     {
+
         // 修正申請を取得
         $correctionRequest = CorrectionRequest::with([
             'attendanceCorrection',
@@ -480,6 +487,100 @@ class AdminAttendanceController extends Controller
         return redirect()
             ->route('admin.correction.list')
             ->with('flashSuccess', '申請を承認しました。');
+    }
+
+    public function exportMonthlyCsv(Request $request, $user_id)
+    {
+        $user = User::where('role',1)
+                    ->find($user_id);
+
+        // 対象月（例: 2025-03）
+        $month = $request->input('month');
+
+        if (!$month) {
+            return back()->with('error', '対象月が指定されていません');
+        }
+
+        if (!$user) {
+            return back()->with('error', '対象ユーザーが存在しません');
+        }
+
+        // 月初・月末
+        $start = Carbon::parse($month . '-01')->startOfMonth();
+        $end   = Carbon::parse($month . '-01')->endOfMonth();
+
+        // 該当ユーザーの勤怠データ
+        $attendances = Attendance::where('user_id', $user->id)
+            ->whereBetween('work_date', [$start->toDateString(), $end->toDateString()])
+            ->where('is_deleted', 0)
+            ->with('breakRecords')
+            ->orderBy('work_date', 'asc')
+            ->get()
+            ->keyBy('work_date');
+
+        // CSV の内容を作成
+        $csv = [];
+
+        // ヘッダー行
+        $csv[] = [
+            '日付',
+            '出勤',
+            '退勤',
+            '休憩合計',
+            '勤務合計',
+        ];
+
+        // 月初～月末までループ
+    for ($date = $start; $date<=($end); $date->addDay()) {
+        $attendance = $attendances->get($date->toDateString());
+
+        $breakTotal = 0;
+        $workTotal = 0;
+
+        if ($attendance) {
+            // 休憩合計
+            $breakTotal = $attendance->breakRecords->sum(function($break){
+                return Carbon::parse($break->break_start_time)
+                    ->diffInMinutes(Carbon::parse($break->break_end_time));
+            });
+
+            // 勤務合計
+            if ($attendance->work_start_time && $attendance->work_end_time) {
+                $workTotal = Carbon::parse($attendance->work_start_time)
+                    ->diffInMinutes(Carbon::parse($attendance->work_end_time)) - $breakTotal;
+            }
+        }
+
+        $workStart = $attendance && $attendance->work_start_time ? Carbon::parse($attendance->work_start_time)->format('H:i') : '';
+        $workEnd   = $attendance && $attendance->work_end_time ? Carbon::parse($attendance->work_end_time)->format('H:i') : '';
+
+        // 休憩・勤務合計が 0 の場合は null
+        $breakTotal = $breakTotal > 0 ? $breakTotal : null;
+        $workTotal  = $workTotal > 0 ? $workTotal : null;
+
+        $csv[] = [
+            $date->format('Y/m/d'),
+            $workStart,
+            $workEnd,
+            $this->formatMinutes($breakTotal),
+            $this->formatMinutes($workTotal),
+        ];
+    }
+
+        // CSV 出力
+        $filename = "{$user->name}_{$month}_attendance.csv";
+
+        $handle = fopen('php://temp', 'r+');
+        foreach ($csv as $line) {
+            fputcsv($handle, $line);
+        }
+        rewind($handle);
+
+        return response()->streamDownload(function () use ($handle) {
+            fpassthru($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv',
+        ]);
     }
 
 }

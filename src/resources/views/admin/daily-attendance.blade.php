@@ -16,10 +16,10 @@
     $today = now()->format('Y年m月d日');
 @endphp
 
-<div class="title-container">
-    <h1 class="title">{{$today}}の勤怠</h1>
-</div>
-<div class="container">
+<div class="container center">
+    <div class="title-container">
+        <h1 class="page__title">{{$today}}の勤怠</h1>
+    </div>
     <form method="get" action="{{ url('admin/attendance/list') }}">
         <a href="{{ url('admin/attendance/list?day='.$prevDay) }}"><i class="fa-solid fa-arrow-left"></i><span>前日</span></a>
         <input type="date" name="date" value="{{ $currentDay->format('Y-m-d') }}">

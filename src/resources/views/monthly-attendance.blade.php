@@ -5,32 +5,45 @@
 
 <!-- css -->
 @section('css')
-<link rel="stylesheet" href="{{ asset('')  }}">
+<link rel="stylesheet" href="{{ asset('/css/monthly-attendance.css')  }}">
 @endsection
 
 <!-- 本体 -->
 @section('content')
 @include('components.header')
 
-<div class="title-container">
-    <h1 class="title">勤怠一覧</h1>
-</div>
-<div class="container">
-    <form method="get" action="{{ url('/attendance/list') }}">
-        <a href="{{ url('/attendance/list?month='.$prevMonth) }}"><i class="fa-solid fa-arrow-left"></i><span>前月</span></a>
-        <input type="month" name="month" value="{{ $currentMonth->format('Y-m') }}">
-        <button type="submit">移動</button>
-        <a href="{{ url('/attendance/list?month='.$nextMonth) }}"><span>翌月</span><i class="fa-solid fa-arrow-right"></i></a>
-    </form>
+<div class="container center">
+    <h1 class="page__title">勤怠一覧</h1>
 
-    <table>
+    <div class="month-nav">
+        <a href="{{ url('/attendance/list?month='.$prevMonth) }}" class="month-nav__link">
+            <i class="fa-solid fa-arrow-left"></i>前月
+        </a>
+        <form method="get" action="{{ url('/attendance/list') }}" class="month-nav__link">
+            <div class="month__calendar">
+                <i class="fa-regular fa-calendar-days"></i>
+                <input
+                    type="month"
+                    name="month"
+                    value="{{ $currentMonth->format('Y-m') }}"
+                    class="month-input-hidden"
+                    onchange="this.form.submit()"
+                >
+            </div>
+            <span class="date-label">{{ $currentMonth->format('Y/m') }}</span>
+        </form>
+        <a href="{{ url('/attendance/list?month='.$nextMonth) }}" class="month-nav__link">
+            翌月<i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <table class="table">
     <tr>
-        <th>日付</th>
-        <th>出勤</th>
-        <th>退勤</th>
-        <th>休憩</th>
-        <th>合計</th>
-        <th>詳細</th>
+        <th class="header__date">日付</th>
+        <th class="header__work-start">出勤</th>
+        <th class="header__work-end">退勤</th>
+        <th class="header__break">休憩</th>
+        <th class="header__work-total">合計</th>
+        <th class="header__detail">詳細</th>
         @foreach($days as $day)
             <tr>
                 <td>{{ \Carbon\Carbon::parse($day['date'])->format('m/d') }}（{{ $day['day_jp'] }}）</td>
@@ -40,7 +53,7 @@
                     {{ $day['break_total'] ?? '' }}
                 </td>
                 <td>{{ $day['work_total'] ?? '' }}</td>
-                <td>
+                <td class="row__detail">
                     @if($day['attendance'])
                         <a href="{{ url('/attendance/detail/'.($day['attendance']->id)) }}" >詳細</a>
                     @else
@@ -51,4 +64,6 @@
         @endforeach
     </table>
 </div>
+
+
 @endsection

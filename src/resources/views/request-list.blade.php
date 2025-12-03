@@ -5,16 +5,16 @@
 
 <!-- css -->
 @section('css')
-<link rel="stylesheet" href="{{ asset('')  }}">
+<link rel="stylesheet" href="{{ asset('/css/request-list.css')  }}">
 @endsection
 
 <!-- 本体 -->
 @section('content')
 @include('components.header')
 
-<div class="container">
+<div class="container center">
     <div class="title-container">
-        <h1 class="title">申請一覧</h1>
+        <h1 class="page__title">申請一覧</h1>
     </div>
 
     <div class="tabs">
@@ -24,25 +24,25 @@
 
     <div class="tab-content active" id="pending">
         @if($pendingRequests->isEmpty())
-            <p>承認待ちの申請はありません。</p>
+            <p class="empty-state">承認待ちの申請はありません。</p>
         @else
             <table class="table">
-                <tr>
-                    <th>状態</th>
-                    <th>名前</th>
-                    <th>対象日</th>
-                    <th>申請理由</th>
-                    <th>申請日時</th>
-                    <th>詳細</th>
+                <trt>
+                    <th class="header__status">状態</th>
+                    <th class="header__name">名前</th>
+                    <th class="header__work-date">対象日時</th>
+                    <th class="header__reason">申請理由</th>
+                    <th class="header__request-date">申請日時</th>
+                    <th class="header__detail">詳細</th>
                 </tr>
                 @foreach ($pendingRequests as $req)
                     <tr>
-                        <td>承認待ち</td>
+                        <td class="row_status">承認待ち</td>
                         <td>{{ $req->targetUser->name }}</td>
                         <td>{{ \Carbon\Carbon::parse($req->work_date)->format('Y/m/d') }}</td>
-                        <td>{{ $req->reason }}</td>
+                        <td class="data__reason">{{ $req->reason }}</td>
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
-                        <td>
+                        <td class="row__detail">
                             @if($req->attendance_id)
                                 <a href="{{ url('/attendance/detail/'.$req->attendance_id) }}">詳細</a>
                             @else
@@ -57,25 +57,25 @@
 
     <div class="tab-content" id="approved">
         @if($approvedRequests->isEmpty())
-            <p>承認済みの申請はありません。</p>
+            <p class="empty-state">承認済みの申請はありません。</p>
         @else
             <table class="table">
                 <tr>
-                    <th>状態</th>
-                    <th>名前</th>
-                    <th>対象日</th>
-                    <th>申請理由</th>
-                    <th>申請日時</th>
-                    <th>詳細</th>
+                    <th class="header__status">状態</th>
+                    <th class="header__name">名前</th>
+                    <th class="header__work-date">対象日時</th>
+                    <th class="header__reason">申請理由</th>
+                    <th class="header__request-date">申請日時</th>
+                    <th class="header__detail">詳細</th>
                 </tr>
                 @foreach ($approvedRequests as $req)
                     <tr>
-                        <td>承認済み</td>
+                        <td class="row_status">承認済み</td>
                         <td>{{ $req->targetUser->name }}</td>
                         <td>{{ \Carbon\Carbon::parse($req->work_date)->format('Y/m/d') }}</td>
-                        <td>{{ $req->reason }}</td>
+                        <td class="data__reason">{{ $req->reason }}</td>
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
-                        <td>
+                        <td class="row__detail">
                             @if($req->attendance_id)
                                 <a href="{{ url('/attendance/detail/'.$req->attendance_id) }}">詳細</a>
                             @else
@@ -87,6 +87,7 @@
             </table>
         @endif
     </div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -104,11 +105,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
-<style>
-.tab-button.active { font-weight: bold; border-bottom: 2px solid #007bff; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-</style>
 
 @endsection

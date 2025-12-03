@@ -12,10 +12,10 @@
 @section('content')
 @include('components.header')
 
-<div class="title-container">
-    <h1 class="title">スタッフ一覧</h1>
-</div>
-<div class="container">
+<div class="container center">
+    <div class="title-container">
+        <h1 class="page__title">スタッフ一覧</h1>
+    </div>
     <table>
         <tr>
             <th>名前</th>

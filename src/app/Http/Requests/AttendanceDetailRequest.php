@@ -54,7 +54,6 @@ class AttendanceDetailRequest extends FormRequest
             //休憩時間の入力がある場合、出勤・退勤必須
             if (!empty($breaks) && (!$start || !$end)) {
                 $validator->errors()->add('work_start_time', '出勤・退勤の両方を入力してください');
-                $validator->errors()->add('work_end_time', '出勤・退勤の両方を入力してください');
             }
 
             // ---------------------------------

@@ -1,0 +1,53 @@
+.verify-email {
+    width: 100%;
+    margin: 0 auto;
+    padding-top: 100px;
+}
+
+.verify-email__inner {
+    background-color: #fff;
+    padding: 50px;
+    text-align: center;
+}
+
+.verify-email__inner-message {
+    margin: 0 0 30px 0;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.verify-email__inner-actions {
+    margin-top: 60px;
+}
+
+.verify-email__inner-verify-button{
+    display: inline-block;
+    padding: 12px 26px;
+    border: 1px solid #000;
+    border-radius: 8px;
+    background-color: #D9D9D9;
+    color: #000;
+    font-weight: bold;
+    font-size: 24px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* 再送ボタン */
+.verify-email__inner-resend-link {
+    display: inline-block;
+    margin-top:60px;
+    border: none;
+    background-color:transparent;
+    color: #0073CC;
+    font-size: 20px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+/* 再送成功メッセージのスタイル */
+.verify-email__success-message {
+    margin-bottom: 20px;
+    color: #28a745;
+    font-weight: bold;
+}

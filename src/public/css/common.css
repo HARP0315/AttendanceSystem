@@ -1,0 +1,138 @@
+*{
+    box-sizing: border-box;
+}
+
+body{
+    width: 100vw;
+    background-color: #F0EFF2;
+}
+
+img{
+    width: 100%;
+}
+
+button{
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+}
+
+select{
+    border: none;
+    outline: none;
+}
+
+header{
+    display: flex;
+    position: sticky;
+    top: 0px;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    padding: 0 30px;
+    background-color: #000;
+    color: #fff;
+    font-size: 16px;
+}
+
+.header__logo{
+    vertical-align: middle;
+    width: 250px;
+    height: fit-content;
+}
+
+.header__nav{
+    display: flex;
+}
+
+.header__nav ul{
+    display: flex;
+    align-items: center;
+}
+
+.header__nav li{
+    margin-right: 30px;
+}
+
+.header__nav li:hover{
+    font-weight: bold;
+}
+
+.header__logout{
+    color: #fff;
+    font-size: 16px;
+}
+
+.header__logout:hover{
+    font-weight: bold;
+}
+
+.container{
+    padding: 5%;
+}
+
+.center{
+    width: 65%;
+    margin: 0 auto;
+    padding: 50px 0;
+    text-align: center;
+}
+
+.page__title{
+    margin-bottom: 30px;
+    text-align: left;
+    font-size: 30px;
+    font-weight: bold;
+    padding: 6px 0 6px 10px;
+    border-left: 8px solid #000;
+}
+
+.error-message{
+    margin-top: 8px;
+    color: #ff333f;
+    font-size: 14px;
+}
+
+/* TODO いるんか？ */
+
+.disable{
+    background-color: #CCC !important;
+    color: #666 !important;
+}
+
+@media (min-width: 768px) and (max-width: 850px) {
+    .header__logo {
+        width: 25vw;
+    }
+}
+
+.table {
+    width: 100%;
+    padding-right: 20px;
+    background-color: #fff;
+    color: #737373;
+    font-weight: bold;
+    border-collapse: collapse;
+    border-radius: 8px;
+}
+
+.table th,
+.table td {
+    border-bottom: 2px solid #E1E1E1;
+}
+
+/* TODO これもここでいいのか */
+.table tr:first-child{
+    border-bottom: 3px solid #E1E1E1;
+}
+
+/* リンク */
+.row__detail {
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+}

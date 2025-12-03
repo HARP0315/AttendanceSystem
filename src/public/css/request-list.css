@@ -1,0 +1,76 @@
+
+
+/* タブエリア全体 */
+.tabs {
+    display: flex;
+    gap: 100px;
+    border-bottom: 1px solid #000;
+    margin-bottom: 40px;
+    padding-left: 50px;
+}
+
+/* タブのボタン（共通） */
+.tab-button {
+    padding-bottom: 10px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.tab-button.active {
+    margin-bottom: -1px;
+    border-bottom: 2px solid #000;
+    font-weight: bold;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.table th,
+.table td {
+    text-align: left;
+}
+
+/* TODO ここの調整して〜 */
+.header__status{
+    padding: 15px;
+    padding-left: 5%;
+}
+
+.row_status{
+    padding: 15px;
+    padding-left: 5%;
+}
+
+.header__status{
+    width: 15%;
+}
+
+.header__name, .header__work-date,
+.header__reason, .header__request-date{
+    width: 14%;
+}
+
+.header__detail{
+    width: 15%;
+}
+
+.data__reason{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.empty-state{
+    margin-top: 20px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+}
