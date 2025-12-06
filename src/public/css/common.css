@@ -94,13 +94,7 @@ header{
     margin-top: 8px;
     color: #ff333f;
     font-size: 14px;
-}
-
-/* TODO いるんか？ */
-
-.disable{
-    background-color: #CCC !important;
-    color: #666 !important;
+    font-weight: bold;
 }
 
 @media (min-width: 768px) and (max-width: 850px) {
@@ -130,41 +124,42 @@ header{
 }
 
 /* リンク */
-.row__detail {
+.data__detail {
     color: #000;
     font-weight: bold;
     text-decoration: none;
     cursor: pointer;
 }
 
-/* ページネーション */
-.pagination {
-    display: flex;
-    justify-content: center;
-    list-style: none;
+/* ボタン */
+
+.form-actions {
+    text-align: right;
+    margin-top: 30px;
 }
 
-.pagination li:not(.active) {
-    border: 1px solid #e0dfde;
-    padding: 4px 12px;
-}
-
-.pagination li:not(:last-child) {
-    border-right: none;
-}
-
-.pagination a {
-    color: #8b7969;
-    text-decoration: none;
-}
-
-.pagination__link {
-    text-decoration: none;
-}
-
-.active {
-    padding: 4px 12px;
-    border: 1px solid #8b7969;
-    background-color: #8b7969;
+.submit__button {
+    padding: 8px 40px;
+    border: none;
+    border-radius: 5px;
+    background-color: #000;
     color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.submit__button:hover {
+    opacity: 0.8;
+}
+
+.error-massage__area{
+    display: flex;
+    justify-content: left;
+}
+
+.error-message2{
+    margin: 8px 0;
+    color: #ff333f;
+    font-size: 14px;
+    font-weight: bold;
 }

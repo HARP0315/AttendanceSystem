@@ -11,10 +11,17 @@ use App\Http\Requests\AdminAttendanceDetailRequest;
 
 class AdminAttendanceController extends Controller
 {
+
+    private function formatMinutes($minutes)
+    {
+        if ($minutes === null) return '';
+            return sprintf('%02d:%02d', intdiv($minutes, 60), $minutes % 60);
+    }
+
     public function dailyAttendance(Request $request)
     {
-        $currentDay = $request->query('day')
-            ? Carbon::parse($request->query('day'))
+        $currentDay = $request->query('date')
+            ? Carbon::parse($request->query('date'))
             : Carbon::today();
 
         $prevDay = $currentDay->copy()->subDay()->format('Y-m-d');
@@ -47,17 +54,21 @@ class AdminAttendanceController extends Controller
                 : null;
 
             // 休憩合計（分）
-            $breakTotal = $attendance && $attendance->breakRecords
-                ? $attendance->breakRecords->sum(function($b) {
-                    $start = Carbon::parse($b->break_start_time);
-                    $end   = Carbon::parse($b->break_end_time);
-                    if ($start && $end) {
-                        $seconds = $end->diffInSeconds($start);
-                        return ceil($seconds / 60); // 1分未満も切り上げ
+            $breakRecords = $attendance->breakRecords;
+
+                    if ($breakRecords->isEmpty()) {
+                        $breakTotal = null;
+                    } else {
+                        $breakTotal = $breakRecords->sum(function($b) {
+                            $start = Carbon::parse($b->break_start_time);
+                            $end   = Carbon::parse($b->break_end_time);
+                            if ($start && $end) {
+                                $seconds = $end->diffInSeconds($start);
+                                return ceil($seconds / 60); // 1分未満切り上げ
+                            }
+                            return 0;
+                        });
                     }
-                    return 0;
-                })
-                : null;
 
             // 勤務合計（分）
             $workTotal = ($attendance && $workStart && $workEnd)
@@ -79,8 +90,8 @@ class AdminAttendanceController extends Controller
                 'attendance'  => $attendance,
                 'work_start'  => $workStart ? $workStart->format('H:i') : null,
                 'work_end'    => $workEnd ? $workEnd->format('H:i') : null,
-                'break_total' => $breakTotal !== null ? sprintf('%02d:%02d', intdiv($workTotal, 60), $breakTotal % 60) : null,
-                'work_total'  => $workTotal !== null ? sprintf('%02d:%02d', intdiv($workTotal, 60), $workTotal % 60) : null,
+                'break_total' => $breakTotal !== null ? $this->formatMinutes($breakTotal) : null,
+                'work_total'  => $workTotal !== null ? $this->formatMinutes($workTotal) : null,
             ];
         }
 
@@ -115,6 +126,42 @@ class AdminAttendanceController extends Controller
             $workDate = $request->query('date') ?? session('work_date');
         }
 
+        $correctionRequest = null;
+        $attendanceCorrection = null;
+        $breakRecords = [];
+        $breakCorrections = [];
+
+        // もし勤怠があるなら、修正申請（status:1）を探す
+        if ($attendance) {
+            $correctionRequest = $attendance->correctionRequests()
+                                            ->where('request_status', 1)
+                                            ->latest()
+                                            ->with(['attendanceCorrection', 'breakTimeCorrections'])
+                                            ->first();
+        }
+
+        // 修正申請がある場合はそちらを優先
+        if (!$attendance_id){
+            $correctionRequest = CorrectionRequest::where('user_id', $user->id)
+                                                ->where('work_date', $workDate)
+                                                ->where('request_status', 1)
+                                                ->latest()
+                                                ->with(['attendanceCorrection', 'breakTimeCorrections'])
+                                                ->first();
+        }
+
+        if ($correctionRequest) {
+
+            $attendanceCorrection = $correctionRequest->attendanceCorrection;
+            $breakCorrections = $correctionRequest->breakTimeCorrections;
+
+        } elseif ($attendance) {
+
+            // 修正申請がない or 承認済みの場合は勤怠データを使用
+            $breakRecords = $attendance->breakRecords ?? [];
+
+        }
+
         // 次回アクセス用にセッションに保存
         session([
             'work_date' => $workDate,
@@ -128,12 +175,15 @@ class AdminAttendanceController extends Controller
             'user',
             'attendance',
             'workDate',
-            'breakRecords'
+            'breakRecords',
+            'attendanceCorrection',
+            'breakCorrections',
+            'correctionRequest',
         ));
 
     }
 
-    public function attendanceCorrectionUpdate(AdminAttendanceDetailRequest $request, $attendance_id = null)
+    public function attendanceDetailUpdate(AdminAttendanceDetailRequest $request, $attendance_id = null)
     {
         $form = $request->validated();
         $breaks = $form['breaks'] ?? [];
@@ -145,6 +195,43 @@ class AdminAttendanceController extends Controller
 
             if (!$attendance) {
                 return back();
+            }
+
+            if ($request->updated_at != $attendance->updated_at) {
+                return back()->withErrors('他のユーザーが先に更新しました。再読み込みしてください');
+            }
+
+            // 勤怠修正があるかチェック
+            $workChanged = false;
+            if ( (($form['work_start_time'] ?? null) != Carbon::parse($attendance->work_start_time)->format('H:i')) ) {
+                $workChanged = true;
+            }
+            if ( (($form['work_end_time'] ?? null) != Carbon::parse($attendance->work_end_time)->format('H:i')) ) {
+                $workChanged = true;
+            }
+
+            // 休憩の変化
+            $existingBreaksArray = $attendance->breakRecords->map(function($b){
+                return [
+                    'start' => $b['break_start_time'] ? Carbon::parse($b['break_start_time'])->format('H:i') : null,
+                    'end'   => $b['break_end_time'] ? Carbon::parse($b['break_end_time'])->format('H:i') : null,
+                ];
+            })->toArray();
+
+            $submittedBreaksFiltered = collect($form['breaks'] ?? [])
+                ->filter(fn($b) => !empty($b['break_start_time']) || !empty($b['break_end_time']))
+                ->map(fn($b) => [
+                    'start' => $b['break_start_time'] ? Carbon::parse($b['break_start_time'])->format('H:i') : null,
+                    'end'   => $b['break_end_time']   ? Carbon::parse($b['break_end_time'])->format('H:i') : null,
+                ])
+                ->values()
+                ->toArray();
+
+            $breaksChanged = ($existingBreaksArray != $submittedBreaksFiltered);
+
+            // 両方とも変更なしなら弾く
+            if ($workChanged === false && $breaksChanged === false) {
+                return back()->withErrors(['no_change' => '勤怠に変更がありません'])->withInput();
             }
 
             $user = $attendance->user; // 勤怠所有者
@@ -164,6 +251,7 @@ class AdminAttendanceController extends Controller
                 $attendance->update([
                     'work_start_time' => null,
                     'work_end_time'   => null,
+                    'reason'         => $form['reason'],
                     'is_deleted'     => 1, //削除
                 ]);
             } else {
@@ -208,19 +296,31 @@ class AdminAttendanceController extends Controller
             }
 
             if ($allWorkNull && $allBreaksNull) {
-                return back()
-                    ->withErrors(['error' => '勤怠を入力してください。'])
-                    ->withInput();
+                return back()->withErrors([
+                    'empty' => '勤怠を入力してください。'
+                ])->withInput();
             }
 
-            $attendance = Attendance::create([
-                'user_id' => $user->id,
-                'work_date' => $workDate,
-                'work_start_time' => $form['work_start_time'],
-                'work_end_time'   => $form['work_end_time'],
-                'status'          => 3, // 退勤済
-                'reason'          => $form['reason'],
-            ]);
+            try {
+
+                // ★ここが UNIQUE の可能性があるところ！
+                $attendance = Attendance::create([
+                    'user_id'        => $user->id,
+                    'work_date'      => $workDate,
+                    'work_start_time'=> $form['work_start_time'],
+                    'work_end_time'  => $form['work_end_time'],
+                    'status'         => 3,
+                    'reason'         => $form['reason'],
+                    'is_deleted'     => 0,
+                ]);
+
+            } catch (\Illuminate\Database\QueryException $e) {
+
+                // ★ UNIQUE 制約違反（同じ user_id + work_date が既にある）
+                return back()
+                    ->withErrors(['error' => 'この日の勤怠はすでに作成されています'])
+                    ->withInput();
+            }
 
             foreach ($breaks as $break) {
                 $start = $break['break_start_time'] ?? null;
@@ -237,12 +337,6 @@ class AdminAttendanceController extends Controller
 
         $backUrl = $request->input('back_url') ?? route('admin.attendance.detail', ['attendance_id' => $attendance->id]);
         return redirect($backUrl)->with('flashSuccess', '勤怠情報を更新しました。');
-    }
-
-    private function formatMinutes($minutes)
-    {
-        if ($minutes === null) return '';
-            return sprintf('%02d:%02d', intdiv($minutes, 60), $minutes % 60);
     }
 
     public function monthlyAttendance(Request $request,$user_id)
@@ -414,6 +508,7 @@ class AdminAttendanceController extends Controller
         $breakCorrections = $correctionRequest->breakTimeCorrections;
 
         // 出退勤、休憩開始・終了が全てnullの場合
+
         $allNull =
             empty($attendanceCorrection->work_start_time) &&
             empty($attendanceCorrection->work_end_time) &&
@@ -568,7 +663,7 @@ class AdminAttendanceController extends Controller
     }
 
         // CSV 出力
-        $filename = "{$user->name}_{$month}_attendance.csv";
+        $filename = "{$user->name}_{$month}_月次勤怠.csv";
 
         $handle = fopen('php://temp', 'r+');
         foreach ($csv as $line) {

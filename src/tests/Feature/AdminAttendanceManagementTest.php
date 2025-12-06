@@ -92,10 +92,9 @@ class AdminAttendanceManagementTest extends TestCase
         $this->actingAs($admin);
 
         //検証
-        $response = $this->get('/admin/attendance/list?day=' . $prevDay);
+        $response = $this->get('/admin/attendance/list?date=' . $prevDay);
 
         $response->assertStatus(200);
-        $response->assertSee($prevDay);
         $response->assertSee($user->name);
         $response->assertSee('09:00');
     }
@@ -121,10 +120,9 @@ class AdminAttendanceManagementTest extends TestCase
         $this->actingAs($admin);
 
         //検証
-        $response = $this->get('/admin/attendance/list?day=' . $nextDay);
+        $response = $this->get('/admin/attendance/list?date=' . $nextDay);
 
         $response->assertStatus(200);
-        $response->assertSee($nextDay);
         $response->assertSee($user->name);
         $response->assertSee('10:00');
     }

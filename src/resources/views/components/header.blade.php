@@ -1,13 +1,14 @@
 <header class="header">
-    <div class="header__logo">
-        <a href="/"><img src="{{ asset('img/logo.png') }}" alt="ロゴ"></a>
-    </div>
 
     @php
         $user = Auth::user();
     @endphp
 
+
     @if ($user && $user->role === 0)
+        <div class="header__logo">
+            <a href="/admin/attendance/list"><img src="{{ asset('img/logo.png') }}" alt="ロゴ"></a>
+        </div>
         <nav class="header__nav">
             <ul>
                 <li><a href="/admin/attendance/list">勤怠一覧</a></li>
@@ -22,6 +23,9 @@
             </ul>
         </nav>
     @elseif ($user && $user->role === 1)
+        <div class="header__logo">
+            <a href="/attendance"><img src="{{ asset('img/logo.png') }}" alt="ロゴ"></a>
+        </div>
         <nav class="header__nav">
             <ul>
                 @if (isset($headerLink))

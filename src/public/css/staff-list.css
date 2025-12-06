@@ -1,0 +1,58 @@
+.table th,
+.table td {
+    padding: 15px;
+    text-align: center;
+}
+
+.header__name{
+    width: 30%;
+}
+
+.header__mail{
+    width: 40%;
+}
+
+.header__monthly-link{
+    width: 30%;
+}
+
+.table tr .header__name,
+.table tr .data__name{
+    padding-left: 15%;
+}
+
+.table tr .header__detail,
+.table tr .data__detail{
+    padding-right: 15%;
+}
+
+/* ページネーション */
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    margin-top: 20px;
+}
+
+.pagination li:not(.active) {
+    padding: 4px 12px;
+}
+
+.pagination li:not(:last-child) {
+    border-right: none;
+}
+
+.pagination a {
+    color: #737373;
+    text-decoration: none;
+}
+
+.pagination__link {
+    text-decoration: none;
+}
+
+.active {
+    padding: 4px 12px;
+    background-color: #737373;
+    color: #fff;
+}

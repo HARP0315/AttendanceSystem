@@ -78,27 +78,14 @@ input[type="time"].form-input::-webkit-calendar-picker-indicator {
 }
 
 /* --- ボタンエリア --- */
-.form-actions {
-    text-align: right;
-    margin-top: 30px;
-}
-
-.submit__button {
-    padding: 8px 40px;
-    border: none;
-    border-radius: 5px;
-    background-color: #000;
-    color: #fff;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-.submit__button:hover {
-    opacity: 0.8;
-}
 
 /* 承認待ちメッセージ */
 .submit__button--disabled {
     color: #FF000080;
     font-size: 18px;
+}
+
+.disabled-btn{
+    background-color: #737373;
+    color: #fff;
 }

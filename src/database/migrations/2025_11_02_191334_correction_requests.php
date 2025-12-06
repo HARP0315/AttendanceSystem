@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('correction_requests', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('attendance_id')->nullable()->constrained()->onDelete('cascade');
             $table->date('work_date');
             $table->string('reason',255);

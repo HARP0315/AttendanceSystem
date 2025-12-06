@@ -18,9 +18,9 @@
     @if(!$correctionRequest)
         {{-- action は attendance の有無で分ける --}}
         @if($attendance)
-            <form action="{{ url('/attendance/detail/'.$attendance->id) }}" method="post" class="form">
+            <form action="{{ url('/attendance/detail/'.$attendance->id) }}" method="post">
         @else
-            <form action="{{ url('/attendance/detail') }}" method="post" class=form>
+            <form action="{{ url('/attendance/detail') }}" method="post">
         @endif
                 @csrf
 
@@ -52,7 +52,9 @@
                                 <input type="time"
                                     name="work_end_time"
                                     class="form-input"
-                                    value="{{ old('work_end_time' , $attendance ? \Carbon\Carbon::parse($attendance->work_end_time)->format('H:i') : '' )}}">
+                                    value="{{ old('work_end_time', $attendance && $attendance->work_end_time
+                                    ? \Carbon\Carbon::parse($attendance->work_end_time)->format('H:i')
+                                    : '') }}">
                             </div>
                             @error('work_start_time')
                                 <p class="error-message">{{ $message }}</p>
@@ -60,6 +62,9 @@
                             @error('work_end_time')
                                 <p class="error-message">{{ $message }}</p>
                             @enderror
+                            @if ($errors->has('error'))
+                                <p class="error-message">{{ $errors->first('error') }}</p>
+                            @endif
                         </td>
                     </tr>
 
@@ -110,7 +115,7 @@
                                 class="form-input adjust-width"
                                 value="{{ old('reason', $attendance ? ($attendance->reason ?? '') : '' )}}">
                             @error('reason')
-                                    <p class="error-message">{{ $message }}</p>
+                                <p class="error-message">{{ $message }}</p>
                             @enderror
                         </td>
                     </tr>
@@ -121,9 +126,6 @@
                         <button type="submit" class="submit__button">修正</button>
                     </div>
                 </div>
-                @if ($errors->has('error'))
-                    <p class="error-message">{{ $errors->first('error') }}</p>
-                @endif
                 <input type="hidden" name="back_url" value="{{ url()->previous() }}">
         </form>
     @else

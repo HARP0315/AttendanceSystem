@@ -5,7 +5,7 @@
 
 <!-- css -->
 @section('css')
-<link rel="stylesheet" href="{{ asset('')  }}">
+<link rel="stylesheet" href="{{ asset('/css/request-list.css') }}">
 @endsection
 
 <!-- 本体 -->
@@ -13,10 +13,7 @@
 @include('components.header')
 
 <div class="container center">
-    <div class="title-container">
-        <h1 class="page__title">申請一覧</h1>
-    </div>
-
+    <h1 class="page__title">申請一覧</h1>
     <div class="tabs">
         <button class="tab-button active" data-target="pending">承認待ち</button>
         <button class="tab-button" data-target="approved">承認済み</button>
@@ -24,26 +21,26 @@
 
     <div class="tab-content active" id="pending">
         @if($pendingRequests->isEmpty())
-            <p>承認待ちの申請はありません。</p>
+            <p class="empty-message">承認待ちの申請はありません。</p>
         @else
             <table class="table">
                 <tr>
-                    <th>状態</th>
-                    <th>名前</th>
-                    <th>対象日</th>
-                    <th>申請理由</th>
-                    <th>申請日時</th>
-                    <th>詳細</th>
+                    <th class="header__status">状態</th>
+                    <th class="header__name">名前</th>
+                    <th class="header__work-date">対象日時</th>
+                    <th class="header__reason">申請理由</th>
+                    <th class="header__request-date">申請日時</th>
+                    <th class="header__detail">詳細</th>
                 </tr>
                 @foreach ($pendingRequests as $req)
                     <tr>
-                        <td>承認待ち</td>
+                        <td class="data_status">承認待ち</td>
                         <td>{{ $req->targetUser->name }}</td>
                         <td>{{ \Carbon\Carbon::parse($req->work_date)->format('Y/m/d') }}</td>
-                        <td>{{ $req->reason }}</td>
+                        <td  class="data__reason">{{ $req->reason }}</td>
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
-                        <td>
-                                <a href="{{ url('admin/stamp_correction_request/approve/'.$req->id) }}">詳細</a>
+                        <td class="data__detail">
+                            <a href="{{ url('admin/stamp_correction_request/approve/'.$req->id) }}">詳細</a>
                         </td>
                     </tr>
                 @endforeach
@@ -53,25 +50,25 @@
 
     <div class="tab-content" id="approved">
         @if($approvedRequests->isEmpty())
-            <p>承認済みの申請はありません。</p>
+            <p class="empty-message">承認済みの申請はありません。</p>
         @else
             <table class="table">
                 <tr>
-                    <th>状態</th>
-                    <th>名前</th>
-                    <th>対象日</th>
-                    <th>申請理由</th>
-                    <th>申請日時</th>
-                    <th>詳細</th>
+                    <th class="header__status">状態</th>
+                    <th class="header__name">名前</th>
+                    <th class="header__work-date">対象日</th>
+                    <th class="header__reason">申請理由</th>
+                    <th class="header__request-date">申請日時</th>
+                    <th class="header__detail">詳細</th>
                 </tr>
                 @foreach ($approvedRequests as $req)
                     <tr>
-                        <td>承認済み</td>
+                        <td class="data_status">承認済み</td>
                         <td>{{ $req->targetUser->name }}</td>
                         <td>{{ \Carbon\Carbon::parse($req->work_date)->format('Y/m/d') }}</td>
-                        <td>{{ $req->reason }}</td>
+                        <td class="data__reason">{{ $req->reason }}</td>
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
-                        <td>
+                        <td class="data__detail">
                             <a href="{{ url('admin/stamp_correction_request/approve/'.$req->id)}}">詳細</a>
                         </td>
                     </tr>
@@ -79,6 +76,7 @@
             </table>
         @endif
     </div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

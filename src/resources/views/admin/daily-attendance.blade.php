@@ -5,36 +5,46 @@
 
 <!-- css -->
 @section('css')
-<link rel="stylesheet" href="{{ asset('')  }}">
+<link rel="stylesheet" href="{{ asset('css/attendance-list.css')  }}">
 @endsection
 
 <!-- 本体 -->
 @section('content')
 @include('components.header')
 
-@php
-    $today = now()->format('Y年m月d日');
-@endphp
-
 <div class="container center">
-    <div class="title-container">
-        <h1 class="page__title">{{$today}}の勤怠</h1>
-    </div>
-    <form method="get" action="{{ url('admin/attendance/list') }}">
-        <a href="{{ url('admin/attendance/list?day='.$prevDay) }}"><i class="fa-solid fa-arrow-left"></i><span>前日</span></a>
-        <input type="date" name="date" value="{{ $currentDay->format('Y-m-d') }}">
-        <button type="submit">移動</button>
-        <a href="{{ url('admin/attendance/list?day='.$nextDay) }}"><span>翌日</span><i class="fa-solid fa-arrow-right"></i></a>
-    </form>
+        <h1 class="page__title">{{ $currentDay->format('Y年m月d日') }}の勤怠</h1>
 
-    <table>
-    <tr>
-        <th>名前</th>
-        <th>出勤</th>
-        <th>退勤</th>
-        <th>休憩</th>
-        <th>合計</th>
-        <th>詳細</th>
+        <div class="attendance-nav">
+        <a href="{{ url('admin/attendance/list?date='.$prevDay) }}" class="attendance-nav__link">
+            <i class="fa-solid fa-arrow-left"></i>前日
+        </a>
+        <form method="get" action="{{ url('admin/attendance/list') }}" class="attendance-nav__link">
+            <div class="attendance__calendar">
+                <i class="fa-regular fa-calendar-days"></i>
+                <input
+                    type="date"
+                    name="date"
+                    value="{{ $currentDay->format('Y-m-d') }}"
+                    class="attendance-input-hidden"
+                    onchange="this.form.submit()"
+                >
+            </div>
+            <span class="date-label">{{ $currentDay->format('Y/m/d') }}</span>
+        </form>
+        <a href="{{ url('admin/attendance/list?date='.$nextDay) }}" class="month-nav__link">
+            翌日<i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <table class="table">
+        <tr>
+            <th class="header__name">名前</th>
+            <th class="header__work-start">出勤</th>
+            <th class="header__work-end">退勤</th>
+            <th class="header__break">休憩</th>
+            <th class="header__work-total">合計</th>
+            <th class="header__detail">詳細</th>
+        </tr>
         @foreach($attendances as $attendance)
             <tr>
                 <td>{{ $attendance['user']->name }}</td>
@@ -42,7 +52,7 @@
                 <td>{{ $attendance['work_end'] ?? '' }}</td>
                 <td>{{ $attendance['break_total'] ?? '' }}</td>
                 <td>{{ $attendance['work_total'] ?? '' }}</td>
-                <td>
+                <td class="data__detail">
                     @if($attendance['attendance'])
                         <a href="{{ url('admin/attendance/'.($attendance['attendance']->id)) }}">詳細</a>
                     @else

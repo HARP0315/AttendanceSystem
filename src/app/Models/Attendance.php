@@ -15,7 +15,8 @@ class Attendance extends Model
         'work_start_time',
         'work_end_time',
         'reason',
-        'status'
+        'status',
+        'is_deleted',
     ];
 
     public function breakRecords()

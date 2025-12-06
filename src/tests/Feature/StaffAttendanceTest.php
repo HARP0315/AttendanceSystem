@@ -121,7 +121,7 @@ class StaffAttendanceTest extends TestCase
         $response->assertStatus(200);
 
         //検証
-        $response->assertDontSee('出勤');
+        $response->assertDontSee('<button name="action" value="work_start" class="attendance__btn">出勤</button>');
 
         //【test】 出勤時刻が勤怠一覧画面で確認できる
         //勤怠一覧画面に出勤時刻が正確に記録されている

@@ -47,12 +47,17 @@ class StaffAttendanceController extends Controller
 
         //出勤
         if ($action === 'work_start') {
-            $attendance = Attendance::create([
-                'user_id'         => $userId,
-                'work_date'       => $today,
-                'work_start_time' => Carbon::now(),
-                'status'          => 1,
-            ]);
+
+            try {
+                $attendance = Attendance::create([
+                    'user_id'         => $userId,
+                    'work_date'       => $today,
+                    'work_start_time' => Carbon::now(),
+                    'status'          => 1,
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                return back()->withErrors('この日の勤怠はすでに作成されています！');
+            }
 
             return back();
         }
@@ -260,15 +265,15 @@ class StaffAttendanceController extends Controller
         // 次回アクセス用にセッションに保存
         session(['work_date' => $workDate]);
 
-        return view('attendance-detail', [
-            'user' => $user,
-            'attendance' => $attendance,
-            'breakRecords' => $breakRecords,
-            'workDate' => $workDate,
-            'attendanceCorrection' => $attendanceCorrection,
-            'breakCorrections' => $breakCorrections,
-            'correctionRequest' => $correctionRequest,
-        ]);
+        return view('attendance-detail', compact(
+            'user',
+            'attendance',
+            'workDate',
+            'breakRecords',
+            'attendanceCorrection',
+            'breakCorrections',
+            'correctionRequest',
+        ));
     }
 
     public function correctionRequestCreate(AttendanceDetailRequest $request, $attendance_id = null)
@@ -286,6 +291,39 @@ class StaffAttendanceController extends Controller
             if (!$attendance) {
                 // 存在しない、もしくは自分以外の勤怠なら戻す
                 return back();
+            }
+
+            // 勤怠修正があるかチェック
+            $workChanged = false;
+            if ( (($form['work_start_time'] ?? null) != Carbon::parse($attendance->work_start_time)->format('H:i')) ) {
+                $workChanged = true;
+            }
+            if ( (($form['work_end_time'] ?? null) != Carbon::parse($attendance->work_end_time)->format('H:i')) ) {
+                $workChanged = true;
+            }
+
+            // 休憩の変化
+            $existingBreaksArray = $attendance->breakRecords->map(function($b){
+                return [
+                    'start' => $b['break_start_time'] ? Carbon::parse($b['break_start_time'])->format('H:i') : null,
+                    'end'   => $b['break_end_time'] ? Carbon::parse($b['break_end_time'])->format('H:i') : null,
+                ];
+            })->toArray();
+
+            $submittedBreaksFiltered = collect($form['breaks'] ?? [])
+                ->filter(fn($b) => !empty($b['break_start_time']) || !empty($b['break_end_time']))
+                ->map(fn($b) => [
+                    'start' => $b['break_start_time'] ? Carbon::parse($b['break_start_time'])->format('H:i') : null,
+                    'end'   => $b['break_end_time']   ? Carbon::parse($b['break_end_time'])->format('H:i') : null,
+                ])
+                ->values()
+                ->toArray();
+
+            $breaksChanged = ($existingBreaksArray != $submittedBreaksFiltered);
+
+            // 両方とも変更なしなら弾く
+            if ($workChanged === false && $breaksChanged === false) {
+                return back()->withErrors(['no_change' => '勤怠に変更がありません'])->withInput();
             }
 
             $form['attendance_id'] = $attendance->id;

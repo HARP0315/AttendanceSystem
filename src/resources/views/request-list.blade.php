@@ -5,7 +5,7 @@
 
 <!-- css -->
 @section('css')
-<link rel="stylesheet" href="{{ asset('/css/request-list.css')  }}">
+<link rel="stylesheet" href="{{ asset('/css/request-list.css') }}">
 @endsection
 
 <!-- 本体 -->
@@ -13,10 +13,7 @@
 @include('components.header')
 
 <div class="container center">
-    <div class="title-container">
-        <h1 class="page__title">申請一覧</h1>
-    </div>
-
+    <h1 class="page__title">申請一覧</h1>
     <div class="tabs">
         <button class="tab-button active" data-target="pending">承認待ち</button>
         <button class="tab-button" data-target="approved">承認済み</button>
@@ -24,10 +21,10 @@
 
     <div class="tab-content active" id="pending">
         @if($pendingRequests->isEmpty())
-            <p class="empty-state">承認待ちの申請はありません。</p>
+            <p class="empty-message">承認待ちの申請はありません。</p>
         @else
             <table class="table">
-                <trt>
+                <tr>
                     <th class="header__status">状態</th>
                     <th class="header__name">名前</th>
                     <th class="header__work-date">対象日時</th>
@@ -37,12 +34,12 @@
                 </tr>
                 @foreach ($pendingRequests as $req)
                     <tr>
-                        <td class="row_status">承認待ち</td>
+                        <td class="data_status">承認待ち</td>
                         <td>{{ $req->targetUser->name }}</td>
                         <td>{{ \Carbon\Carbon::parse($req->work_date)->format('Y/m/d') }}</td>
                         <td class="data__reason">{{ $req->reason }}</td>
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
-                        <td class="row__detail">
+                        <td class="data__detail">
                             @if($req->attendance_id)
                                 <a href="{{ url('/attendance/detail/'.$req->attendance_id) }}">詳細</a>
                             @else
@@ -57,7 +54,7 @@
 
     <div class="tab-content" id="approved">
         @if($approvedRequests->isEmpty())
-            <p class="empty-state">承認済みの申請はありません。</p>
+            <p class="empty-message">承認済みの申請はありません。</p>
         @else
             <table class="table">
                 <tr>
@@ -70,12 +67,12 @@
                 </tr>
                 @foreach ($approvedRequests as $req)
                     <tr>
-                        <td class="row_status">承認済み</td>
+                        <td class="data_status">承認済み</td>
                         <td>{{ $req->targetUser->name }}</td>
                         <td>{{ \Carbon\Carbon::parse($req->work_date)->format('Y/m/d') }}</td>
                         <td class="data__reason">{{ $req->reason }}</td>
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
-                        <td class="row__detail">
+                        <td class="data__detail">
                             @if($req->attendance_id)
                                 <a href="{{ url('/attendance/detail/'.$req->attendance_id) }}">詳細</a>
                             @else

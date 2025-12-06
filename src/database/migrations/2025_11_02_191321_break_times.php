@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('break_times', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('attendance_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('attendance_id')->constrained()->cascadeOnDelete();
             $table->time('break_start_time')->nullable();
             $table->time('break_end_time')->nullable();
             $table->timestamps();

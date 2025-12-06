@@ -19,6 +19,13 @@
         $todayStr = $today->format('Y年m月d日') . ' (' . $w[$today->dayOfWeek] . ')';
     @endphp
 
+
+    <div class=error-massage__area>
+        @if ($errors->has('error'))
+            <p class="error-message2">{{ $errors->first('error') }}</p>
+        @endif
+    </div>
+
     {{-- 勤務外 --}}
     @if(!$attendance)
         <div class=attendance__status>勤務外</div>
@@ -38,6 +45,7 @@
             @csrf
             <button name="action" value="work_end" class="attendance__btn">退勤</button>
             <button name="action" value="break_start" class="attendance__btn btn--white">休憩入</button>
+            <input type="hidden" name="updated_at" value="{{ $attendance->updated_at }}">
         </form>
 
     {{-- 休憩中 --}}
@@ -48,6 +56,7 @@
         <form action="/attendance" method="post">
             @csrf
             <button name="action" value="break_end" class="attendance__btn btn--white">休憩戻</button>
+            <input type="hidden" name="updated_at" value="{{ $attendance->updated_at }}">
         </form>
 
     {{-- 退勤済 --}}

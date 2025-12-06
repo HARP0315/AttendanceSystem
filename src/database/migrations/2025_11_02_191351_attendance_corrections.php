@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('attendance_corrections', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('correction_request_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('correction_request_id')->constrained()->cascadeOnDelete();
             $table->time('work_start_time')->nullable();
             $table->time('work_end_time')->nullable();
             $table->timestamps();

@@ -48,7 +48,7 @@ Route::prefix('')->middleware(['auth','staff.verified'])->group(function () {
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('/attendance/list', [AdminAttendanceController::class, 'dailyAttendance'])->name('admin.attendance.list');
     Route::get('/attendance/{attendance_id?}', [AdminAttendanceController::class, 'attendanceDetail'])->name('admin.attendance.detail');
-    Route::post('/attendance/{attendance_id?}', [AdminAttendanceController::class, 'attendanceCorrectionUpdate'])->name('admin.attendance.detail');
+    Route::post('/attendance/{attendance_id?}', [AdminAttendanceController::class, 'attendanceDetailUpdate'])->name('admin.attendance.detail');
     Route::get('/staff/list', [AdminAttendanceController::class, 'staffList']);
     Route::get('/attendance/staff/{id}', [AdminAttendanceController::class, 'monthlyAttendance'])->name('admin.monthly.attendance');
     Route::get('/stamp_correction_request/list', [AdminAttendanceController::class, 'requestList'])->name('admin.correction.list');
