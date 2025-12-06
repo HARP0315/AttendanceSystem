@@ -54,6 +54,7 @@ class StaffAttendanceController extends Controller
                     'work_date'       => $today,
                     'work_start_time' => Carbon::now(),
                     'status'          => 1,
+                    'is_deleted'      => 0,
                 ]);
             } catch (\Illuminate\Database\QueryException $e) {
                 return back()->withErrors('この日の勤怠はすでに作成されています！');

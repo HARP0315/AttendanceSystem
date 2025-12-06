@@ -31,7 +31,7 @@
         <div class=attendance__status>勤務外</div>
         <p class="date">{{ $todayStr }}</p>
         <p id="clock"></p>
-        <form action="/attendance" method="post">
+        <form action="{{ route('attendance.store') }}" method="post">
             @csrf
             <button name="action" value="work_start" class="attendance__btn">出勤</button>
         </form>
@@ -41,7 +41,7 @@
         <div class=attendance__status>出勤中</div>
         <p class="date">{{ $todayStr }}</p>
         <p id="clock"></p>
-        <form action="/attendance" method="post">
+        <form action="{{ route('attendance.store') }}" method="post">
             @csrf
             <button name="action" value="work_end" class="attendance__btn">退勤</button>
             <button name="action" value="break_start" class="attendance__btn btn--white">休憩入</button>
@@ -53,7 +53,7 @@
         <div class=attendance__status>休憩中</div>
         <p class="date">{{ $todayStr }}</p>
         <p id="clock"></p>
-        <form action="/attendance" method="post">
+        <form action="{{ route('attendance.store') }}" method="post">
             @csrf
             <button name="action" value="break_end" class="attendance__btn btn--white">休憩戻</button>
             <input type="hidden" name="updated_at" value="{{ $attendance->updated_at }}">

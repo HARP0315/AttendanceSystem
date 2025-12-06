@@ -12,11 +12,11 @@
 @section('content')
 @include('components.header')
 
-<form action="/admin/login" method="post" class="auth__center">
+<form action="{{ route('admin.login.store') }}" method="post" class="auth__center">
     @csrf
     <h1 class="auth__title">ログイン</h1>
     <label for="mail" class="entry__name">メールアドレス</label>
-    <input name="email" id="mail" type="email" class="input" value="{{ old('email') }}">
+    <input name="email" id="mail" type="mail" class="input" value="{{ old('email') }}">
     <div class="error-message">
         @error('email')
             {{ $message }}

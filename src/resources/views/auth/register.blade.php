@@ -23,7 +23,7 @@
         @enderror
     </div>
     <label for="mail" class="entry__name">メールアドレス</label>
-    <input name="email" id="mail" type="email" class="input" value="{{ old('email') }}">
+    <input name="email" id="mail" type="mail" class="input" value="{{ old('email') }}">
     <div class="error-message">
         @error('email')
             {{ $message }}

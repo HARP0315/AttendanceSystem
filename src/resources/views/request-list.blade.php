@@ -41,9 +41,9 @@
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
                         <td class="data__detail">
                             @if($req->attendance_id)
-                                <a href="{{ url('/attendance/detail/'.$req->attendance_id) }}">詳細</a>
+                                <a href="{{ route('attendance.detail', ['attendance_id' => $req->attendance_id]) }}">詳細</a>
                             @else
-                                <a href="{{ url('/attendance/detail') }}?date={{ $req->work_date }}">詳細</a>
+                                <a href="{{ route('attendance.detail', ['date' => $req->work_date]) }}">詳細</a>
                             @endif
                         </td>
                     </tr>
@@ -74,9 +74,9 @@
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
                         <td class="data__detail">
                             @if($req->attendance_id)
-                                <a href="{{ url('/attendance/detail/'.$req->attendance_id) }}">詳細</a>
+                                <a href="{{ route('attendance.detail', ['attendance_id' => $req->attendance_id]) }}">詳細</a>
                             @else
-                                <a href="{{ url('/attendance/detail') }}?date={{ $req->work_date }}">詳細</a>
+                                <a href="{{ route('attendance.detail', ['date' => $req->work_date]) }}">詳細</a>
                             @endif
                         </td>
                     </tr>

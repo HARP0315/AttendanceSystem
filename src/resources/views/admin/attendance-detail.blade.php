@@ -209,7 +209,7 @@
                 {{-- 承認待ちの時は擬似ボタン --}}
                 <div class="form-actions">
                     <div class="submit__button--disabled">
-                        <p>*承認待ちのため修正はできません。</p>
+                        <p>*修正承認待ちのため修正はできません。</p>
                     </div>
                 </div>
     @endif
