@@ -66,9 +66,6 @@
         @csrf
         <input class="submit__button export__btn" type="submit" value="CSV出力">
         <input type="hidden" name="month" value="{{ $currentMonth->format('Y-m') }}">
-        @if ($errors->has('error'))
-            <p class="error-message">{{ $errors->first('error') }}</p>
-        @endif
     </form>
 </div>
 @endsection

@@ -636,11 +636,11 @@ class AdminAttendanceController extends Controller
         $month = $request->input('month');
 
         if (!$month) {
-            return back()->with('error', '対象月が指定されていません');
+            return back();
         }
 
         if (!$user) {
-            return back()->with('error', '対象ユーザーが存在しません');
+            return back();
         }
 
         $start = Carbon::parse($month . '-01')->startOfMonth();
