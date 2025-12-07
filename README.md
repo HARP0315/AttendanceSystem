@@ -258,7 +258,7 @@ no matching manifest for linux/arm64/v8 in the manifest list entries という�
 
 ### ER図
 
-![alt](ER.png)
+![alt](ER図.png)
 
 <a id="テストアカウント"></a>
 ## ■テストアカウント
