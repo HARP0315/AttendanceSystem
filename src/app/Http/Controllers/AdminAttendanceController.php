@@ -569,7 +569,6 @@ class AdminAttendanceController extends Controller
             } else {
 
                 $attendance->update([
-                    'work_date' => null,
                     'work_start_time' => $attendanceCorrection->work_start_time,
                     'work_end_time'   => $attendanceCorrection->work_end_time,
                     'reason'          => $correctionRequest->reason,

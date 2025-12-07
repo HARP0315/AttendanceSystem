@@ -215,11 +215,11 @@ class StaffAttendanceController extends Controller
         $user = Auth::user();
         $attendance = null;
         $workDate = $request->query('date') ?? session('work_date');
+        $isDeleted = false;
 
         if ($attendance_id) {
 
             $attendance = Attendance::where('user_id', $user->id)
-                                    ->where('is_deleted', '=', 0)
                                     ->with('breakRecords','correctionRequests')
                                     ->find($attendance_id);
 
@@ -227,23 +227,31 @@ class StaffAttendanceController extends Controller
                 return back();
             }
 
+            $isDeleted = $attendance && $attendance->is_deleted == 1;
             $workDate = $attendance->work_date;
         }
 
         $correctionRequest = null;
         $attendanceCorrection = null;
+        $deletedRequest = null;
         $breakRecords = [];
         $breakCorrections = [];
 
-        if ($attendance) {
+        if ($attendance && !$isDeleted) {
             $correctionRequest = $attendance->correctionRequests()
                                             ->where('request_status', 1)
                                             ->latest()
                                             ->with(['attendanceCorrection', 'breakTimeCorrections'])
                                             ->first();
+        } elseif($attendance && $isDeleted) {
+	        $deletedRequest = $attendance->correctionRequests()
+                                            ->where('request_status', 2)
+                                            ->latest()
+                                            ->first();
         }
 
-        if (!$attendance_id){
+
+        if (!$attendance_id && !$isDeleted){
             $correctionRequest = CorrectionRequest::where('user_id', $user->id)
                                                   ->where('work_date', $workDate)
                                                   ->where('request_status', 1)
@@ -257,7 +265,7 @@ class StaffAttendanceController extends Controller
             $attendanceCorrection = $correctionRequest->attendanceCorrection;
             $breakCorrections = $correctionRequest->breakTimeCorrections;
 
-        } elseif ($attendance) {
+        } elseif ($attendance && !$isDeleted) {
 
             $breakRecords = $attendance->breakRecords ?? [];
 
@@ -273,6 +281,7 @@ class StaffAttendanceController extends Controller
             'attendanceCorrection',
             'breakCorrections',
             'correctionRequest',
+            'deletedRequest'
         ));
     }
 

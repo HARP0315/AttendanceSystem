@@ -15,7 +15,7 @@
 <div class="container center">
     <h1 class="page__title">勤怠詳細</h1>
 
-    @if(!$correctionRequest)
+    @if(!$correctionRequest && !$deletedRequest)
         <form action="{{ $attendance
             ? route('attendance.detail', ['attendance_id' => $attendance->id])
             : route('attendance.detail') }}" method="post"
@@ -127,7 +127,7 @@
             </div>
             <input type="hidden" name="back_url" value="{{ url()->previous() }}">
         </form>
-    @else
+    @elseif($correctionRequest && !$deletedRequest)
         <table class="table">
             <tr>
                 <th>名前</th>
@@ -196,6 +196,53 @@
                 <p>*承認待ちのため修正はできません。</p>
             </div>
         </div>
+    @elseif($deletedRequest)
+	    <table class="table">
+            <tr>
+                <th>名前</th>
+                <td>{{ $user->name }}</td>
+            </tr>
+            <tr>
+                <th>日付</th>
+                <td>
+                    <div class="data__date">
+                        <p>{{ \Carbon\Carbon::parse($workDate)->format('Y年') }}</p>
+                        <p>{{ \Carbon\Carbon::parse($workDate)->format('m月d日') }}</p>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>出勤・退勤</th>
+                <td>
+                    <div class="group__time-area">
+                        <p class="time">削除済み</p>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>休憩</th>
+                    <td>
+                        <div class="group__time-area">
+                            <p class="time">削除済み</p>
+                        </div>
+                    </td>
+                </tr>
+            <tr>
+                <th>備考</th>
+                <td>
+                    <p class="reason">
+                        {{ $deletedRequest ? ($deletedRequest->reason ?? '') : '' }}
+                    </p>
+                </td>
+            </tr>
+        </table>
+
+        <div class="form-actions">
+            <div class="submit__button--disabled">
+                <p>*削除済みの勤怠です。</p>
+            </div>
+        </div>
     @endif
+
 </div>
 @endsection
