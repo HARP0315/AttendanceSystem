@@ -4,7 +4,6 @@
         $user = Auth::user();
     @endphp
 
-
     @if ($user && $user->role === 0)
         <div class="header__logo">
             <a href="/admin/attendance/list"><img src="{{ asset('img/logo.png') }}" alt="ロゴ"></a>

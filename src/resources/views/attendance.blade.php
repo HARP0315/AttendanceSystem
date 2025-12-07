@@ -1,7 +1,7 @@
 @extends('layouts.default')
 
 <!-- タイトル -->
-@section('title','勤怠入力')
+@section('title','勤怠打刻')
 
 <!-- css -->
 @section('css')
@@ -18,7 +18,6 @@
         $today = now();
         $todayStr = $today->format('Y年m月d日') . ' (' . $w[$today->dayOfWeek] . ')';
     @endphp
-
 
     <div class=error-massage__area>
         @if ($errors->has('error'))
@@ -80,5 +79,4 @@
     updateClock();
     setInterval(updateClock, 1000);
 </script>
-
 @endsection

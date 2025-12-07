@@ -22,7 +22,6 @@
                 <th>名前</th>
                 <td>{{ $correctionRequest->targetUser->name }}</td>
             </tr>
-
             <tr>
                 <th>日付</th>
                 <td>
@@ -32,40 +31,48 @@
                     </div>
                 </td>
             </tr>
-
             <tr>
                 <th>出勤・退勤</th>
                 <td>
                     <div class="group__time-area">
                         <p class="time">
-                            {{ $correctionRequest->attendanceCorrection->work_start_time ? \Carbon\Carbon::parse($correctionRequest->attendanceCorrection->work_start_time)->format('H:i') : '' }}
+                            {{ $correctionRequest->attendanceCorrection->work_start_time
+                                ? \Carbon\Carbon::parse($correctionRequest->attendanceCorrection->work_start_time)->format('H:i')
+                                : ''
+                            }}
                         </p>
                         <p>〜</p>
                         <p class="time">
-                            {{ $correctionRequest->attendanceCorrection->work_end_time ? \Carbon\Carbon::parse($correctionRequest->attendanceCorrection->work_end_time)->format('H:i') : '' }}
+                            {{ $correctionRequest->attendanceCorrection->work_end_time
+                                ? \Carbon\Carbon::parse($correctionRequest->attendanceCorrection->work_end_time)->format('H:i')
+                                : ''
+                            }}
                         </p>
                     </div>
                 </td>
             </tr>
-
-            {{-- 休憩一覧 --}}
             @foreach($breaks as $index => $break)
             <tr>
                 <th>{{ $index === 0 ? '休憩' : '休憩' . ($index + 1) }}</th>
                 <td>
                     <div class="group__time-area">
                         <p class="time">
-                            {{ $break->break_start_time ? \Carbon\Carbon::parse($break->break_start_time)->format('H:i') : '' }}
+                            {{ $break->break_start_time
+                                ? \Carbon\Carbon::parse($break->break_start_time)->format('H:i')
+                                : ''
+                            }}
                         </p>
                         <p>〜</p>
                         <p class="time">
-                            {{ $break->break_end_time ? \Carbon\Carbon::parse($break->break_end_time)->format('H:i') : '' }}
+                            {{ $break->break_end_time
+                                ? \Carbon\Carbon::parse($break->break_end_time)->format('H:i')
+                                : ''
+                            }}
                         </p>
                     </div>
                 </td>
             </tr>
             @endforeach
-
             <tr>
                 <th>備考</th>
                 <td class="reason">
@@ -73,6 +80,7 @@
                 </td>
             </tr>
         </table>
+
         @if ($correctionRequest->request_status == 1)
             <div class="form-actions">
                 <button type=submit class="submit__button approved-btn">承認</button>

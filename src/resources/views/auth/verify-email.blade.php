@@ -21,23 +21,23 @@
             <div class="verify-email__inner-actions">
                 <div class="verify-email__inner-link-wrapper">
                     <a
-                     href="http://localhost:8025"
-                     target="_blank"
-                     class="verify-email__inner-verify-button"
+                        href="http://localhost:8025"
+                        target="_blank"
+                        class="verify-email__inner-verify-button"
                     >
-                     認証はこちらから
+                        認証はこちらから
                     </a>
                 </div>
                 <form
-                 class="verify-email__inner-resend-form"
-                 method="POST"
-                 action="{{ route('verification.send') }}"
+                    class="verify-email__inner-resend-form"
+                    method="POST"
+                    action="{{ route('verification.send') }}"
                 >
                     @csrf
                     <input
-                     type="submit"
-                     class="verify-email__inner-resend-link"
-                     value="認証メールを再送する"
+                        type="submit"
+                        class="verify-email__inner-resend-link"
+                        value="認証メールを再送する"
                     >
                 </form>
             </div>

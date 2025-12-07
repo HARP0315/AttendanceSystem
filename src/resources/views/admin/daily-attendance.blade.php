@@ -19,7 +19,8 @@
         <a href="{{ route('admin.attendance.list', ['date' => $prevDay]) }}" class="attendance-nav__link">
             <i class="fa-solid fa-arrow-left"></i>前日
         </a>
-        <form method="get" action="{{ route('admin.attendance.list') }}" class="attendance-nav__link">
+        <form method="get"
+            action="{{ route('admin.attendance.list') }}" class="attendance-nav__link">
             <div class="attendance__calendar">
                 <i class="fa-regular fa-calendar-days"></i>
                 <input
@@ -35,7 +36,6 @@
         <a href="{{ route('admin.attendance.list', ['date' => $nextDay]) }}" class="month-nav__link">
             翌日<i class="fa-solid fa-arrow-right"></i></a>
     </div>
-
     <table class="table">
         <tr>
             <th class="header__name">名前</th>

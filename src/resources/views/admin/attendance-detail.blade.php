@@ -16,8 +16,6 @@
     <h1 class="page__title">勤怠詳細</h1>
 
     @if(!$correctionRequest)
-        {{-- action は attendance の有無で分ける --}}
-
         <form action="{{ $attendance
             ? route('admin.attendance.detail.update', ['attendance_id' => $attendance->id])
             : route('admin.attendance.detail.update') }}" method="post">
@@ -33,7 +31,6 @@
                     <th>名前</th>
                     <td>{{ $user->name }}</td>
                 </tr>
-
                 <tr>
                     <th>日付</th>
                     <td>
@@ -43,7 +40,6 @@
                         </div>
                     </td>
                 </tr>
-
                 <tr>
                     <th>出勤・退勤</th>
                     <td>
@@ -51,14 +47,20 @@
                             <input type="time"
                                 name="work_start_time"
                                 class="form-input"
-                                value="{{ old('work_start_time' , $attendance ? \Carbon\Carbon::parse($attendance->work_start_time)->format('H:i') : '' )}}">
+                                value="{{ old('work_start_time' , $attendance
+                                            ? \Carbon\Carbon::parse($attendance->work_start_time)->format('H:i')
+                                            : '' )
+                                        }}"
+                            >
                             <span>〜</span>
                             <input type="time"
                                 name="work_end_time"
                                 class="form-input"
                                 value="{{ old('work_end_time', $attendance && $attendance->work_end_time
-                                        ? \Carbon\Carbon::parse($attendance->work_end_time)->format('H:i')
-                                        : '') }}">
+                                            ? \Carbon\Carbon::parse($attendance->work_end_time)->format('H:i')
+                                            : ''
+                                        )}}"
+                            >
                         </div>
                         @error('work_start_time')
                             <p class="error-message">{{ $message }}</p>
@@ -75,9 +77,7 @@
                     </td>
                 </tr>
 
-                {{-- 休憩一覧 --}}
                 @php
-                    // 休憩レコードが0の場合は空の配列にしておく
                     $breaks = $breakRecords ?? [];
                     $breaks[] = ['break_start_time' => '', 'break_end_time' => ''];
                 @endphp
@@ -90,20 +90,20 @@
                             <input type="time"
                                 name="breaks[{{ $index }}][break_start_time]"
                                 class="form-input"
-                                value="{{ old("breaks.$index.break_start_time",
-                                        is_object($break)
+                                value="{{ old("breaks.$index.break_start_time",is_object($break)
                                             ? ($break->break_start_time ? \Carbon\Carbon::parse($break->break_start_time)->format('H:i') : '')
                                             : ($break['break_start_time'] ? \Carbon\Carbon::parse($break['break_start_time'])->format('H:i') : '')
-                                        )}}">
+                                        )}}"
+                            >
                             <span>〜</span>
                             <input type="time"
                                 name="breaks[{{ $index }}][break_end_time]"
                                 class="form-input"
-                                value="{{ old("breaks.$index.break_end_time",
-                                        is_object($break)
+                                value="{{ old("breaks.$index.break_end_time",is_object($break)
                                             ? ($break->break_end_time ? \Carbon\Carbon::parse($break->break_end_time)->format('H:i') : '')
                                             : ($break['break_end_time'] ? \Carbon\Carbon::parse($break['break_end_time'])->format('H:i') : '')
-                                        )}}">
+                                        )}}"
+                            >
                         </div>
                         @error("breaks.$index.break_start_time")
                             <p class="error-message">{{ $message }}</p>
@@ -114,8 +114,6 @@
                     </td>
                 </tr>
                 @endforeach
-
-
                 <tr>
                     <th>備考</th>
                     <td>
@@ -141,7 +139,6 @@
                 <th>名前</th>
                 <td>{{ $user->name }}</td>
             </tr>
-
             <tr>
                 <th>日付</th>
                 <td>
@@ -151,23 +148,27 @@
                     </div>
                 </td>
             </tr>
-
             <tr>
                 <th>出勤・退勤</th>
                 <td>
                     <div class="group__time-area">
                         <p class="time">
-                            {{ $attendanceCorrection ? ($attendanceCorrection->work_start_time ? \Carbon\Carbon::parse($attendanceCorrection->work_start_time)->format('H:i') : '') : '' }}
+                            {{ $attendanceCorrection
+                                ? ($attendanceCorrection->work_start_time ? \Carbon\Carbon::parse($attendanceCorrection->work_start_time)->format('H:i') : '')
+                                : ''
+                            }}
                         </p>
                         <p>〜</p>
                         <p class="time">
-                            {{ $attendanceCorrection ? ($attendanceCorrection->work_end_time ? \Carbon\Carbon::parse($attendanceCorrection->work_end_time)->format('H:i') : '') : '' }}
+                            {{ $attendanceCorrection
+                                ? ($attendanceCorrection->work_end_time ? \Carbon\Carbon::parse($attendanceCorrection->work_end_time)->format('H:i') : '')
+                                : ''
+                            }}
                         </p>
                     </div>
                 </td>
             </tr>
 
-            {{-- 休憩一覧 --}}
             @php
                 $breaks = $breakCorrections;
             @endphp
@@ -180,19 +181,20 @@
                         <p class="time">
                             {{ is_object($break)
                                 ?($break->break_start_time ? \Carbon\Carbon::parse($break->break_start_time)->format('H:i') : '')
-                                : ($break['break_start_time'] ? \Carbon\Carbon::parse($break['break_start_time'])->format('H:i') : '') }}
+                                : ($break['break_start_time'] ? \Carbon\Carbon::parse($break['break_start_time'])->format('H:i') : '')
+                            }}
                         </p>
                         <p>〜</p>
                         <p class="time">
                             {{ is_object($break)
                                 ? ($break->break_end_time ? \Carbon\Carbon::parse($break->break_end_time)->format('H:i') : '')
-                                : ($break['break_end_time'] ? \Carbon\Carbon::parse($break['break_end_time'])->format('H:i') : '') }}
+                                : ($break['break_end_time'] ? \Carbon\Carbon::parse($break['break_end_time'])->format('H:i') : '')
+                            }}
                         </p>
                     </div>
                 </td>
             </tr>
             @endforeach
-
             <tr>
                 <th>備考</th>
                 <td>
@@ -203,7 +205,6 @@
             </tr>
         </table>
 
-        {{-- 承認待ちの時は擬似ボタン --}}
         <div class="form-actions">
             <div class="submit__button--disabled">
                 <p>*修正承認待ちのため修正はできません。</p>

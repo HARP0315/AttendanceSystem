@@ -30,7 +30,7 @@
             </tr>
         @endforeach
     </table>
-    {{-- ページネーションリンク --}}
+
     <div class="pagination">
         {{ $users->links('vendor.pagination.custom') }}
     </div>

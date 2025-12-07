@@ -62,16 +62,16 @@
                     <th class="header__detail">詳細</th>
                 </tr>
                 @foreach ($approvedRequests as $req)
-                    <tr>
-                        <td class="data_status">承認済み</td>
-                        <td>{{ $req->targetUser->name }}</td>
-                        <td>{{ \Carbon\Carbon::parse($req->work_date)->format('Y/m/d') }}</td>
-                        <td class="data__reason">{{ $req->reason }}</td>
-                        <td>{{ $req->created_at->format('Y/m/d') }}</td>
-                        <td class="data__detail">
-                            <a href="{{ route('admin.approval.view', ['correction_request_id' => $req->id]) }}">詳細</a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td class="data_status">承認済み</td>
+                    <td>{{ $req->targetUser->name }}</td>
+                    <td>{{ \Carbon\Carbon::parse($req->work_date)->format('Y/m/d') }}</td>
+                    <td class="data__reason">{{ $req->reason }}</td>
+                    <td>{{ $req->created_at->format('Y/m/d') }}</td>
+                    <td class="data__detail">
+                        <a href="{{ route('admin.approval.view', ['correction_request_id' => $req->id]) }}">詳細</a>
+                    </td>
+                </tr>
                 @endforeach
             </table>
         @endif
@@ -79,20 +79,19 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const buttons = document.querySelectorAll('.tab-button');
-    const tabs = document.querySelectorAll('.tab-content');
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.tab-button');
+        const tabs = document.querySelectorAll('.tab-content');
 
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            buttons.forEach(b => b.classList.remove('active'));
-            tabs.forEach(t => t.classList.remove('active'));
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => b.classList.remove('active'));
+                tabs.forEach(t => t.classList.remove('active'));
 
-            btn.classList.add('active');
-            document.getElementById(btn.dataset.target).classList.add('active');
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.target).classList.add('active');
+            });
         });
     });
-});
 </script>
-
 @endsection

@@ -37,14 +37,14 @@
     </div>
 
     <table class="table">
-    <tr>
-        <th class="header__date">日付</th>
-        <th class="header__work-start">出勤</th>
-        <th class="header__work-end">退勤</th>
-        <th class="header__break">休憩</th>
-        <th class="header__work-total">合計</th>
-        <th class="header__detail">詳細</th>
-    </tr>
+        <tr>
+            <th class="header__date">日付</th>
+            <th class="header__work-start">出勤</th>
+            <th class="header__work-end">退勤</th>
+            <th class="header__break">休憩</th>
+            <th class="header__work-total">合計</th>
+            <th class="header__detail">詳細</th>
+        </tr>
         @foreach($days as $day)
             <tr>
                 <td>{{ \Carbon\Carbon::parse($day['date'])->format('m/d') }}（{{ $day['day_jp'] }}）</td>
@@ -65,6 +65,4 @@
         @endforeach
     </table>
 </div>
-
-
 @endsection
