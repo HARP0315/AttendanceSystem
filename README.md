@@ -140,23 +140,23 @@ no matching manifest for linux/arm64/v8 in the manifest list entries という�
 
 テスト用のデータベース／テーブルを作成します。
 
-  ```bash
-  # 1. PHPコンテナに入る
-  docker-compose exec mysql bash
+```bash
+# 1. PHPコンテナに入る
+docker-compose exec mysql bash
 
-  # 2. MySQLクライアントに接続する
-  (パスワードを求められたら `docker-compose.yml`ファイルの MYSQL_ROOT_PASSWORD を入力)
-  mysql -h mysql -u root -p
+# 2. MySQLクライアントに接続する
+(パスワードを求められたら `docker-compose.yml`ファイルの MYSQL_ROOT_PASSWORD を入力)
+mysql -h mysql -u root -p
 
-  # 3. MySQLプロンプトで、テスト用データベースを作成する
-  CREATE DATABASE test_database;
+# 3. MySQLプロンプトで、テスト用データベースを作成する
+CREATE DATABASE test_database;
 
-  # 4. MySQLクライアントを終了する
-  exit;
+# 4. MySQLクライアントを終了する
+exit;
 
-  # 5. PHPコンテナ内でテーブルを作成する
-  php artisan migrate:fresh --env=testing
-  ```
+# 5. PHPコンテナ内でテーブルを作成する
+php artisan migrate:fresh --env=testing
+```
 
 - **実行**: PHPコンテナ内で以下のコマンドを実行します。
 
@@ -259,18 +259,18 @@ no matching manifest for linux/arm64/v8 in the manifest list entries という�
 
 ### 管理者
 
-name: 管理者
-email: 1234@1234
+name: 管理者<br>
+email: 1234@1234<br>
 password: 12341234
 
 ### スタッフ
 
-name: スタッフ一郎
-email: general1@gmail.com
+name: スタッフ一郎<br>
+email: general1@gmail.com<br>
 password: password
 
-name: スタッフ二郎
-email: general2@gmail.com
+name: スタッフ二郎<br>
+email: general2@gmail.com<br>
 password: password
 
 その他、全8名のスタッフのダミーデータを作成しています
