@@ -1,3 +1,4 @@
+/* 勤怠詳細テーブル */
 
 .table th{
     width: 30%;
@@ -17,22 +18,16 @@
     height: 90px;
 }
 
-.table tr:first-child{
-    border-bottom: 2px solid #E1E1E1 !important;
-}
+/* 各パーツ */
 
-
-/* --- 各パーツのスタイル --- */
-
-/* 日付の横並び表示 */
 .data__date {
     width: 50%;
     display: flex;
     justify-content: space-between;
 }
 
-/* 時間入力の横並び（入力欄 〜 入力欄） */
-.group__time-input ,.group__time-area{
+.group__time-input,
+.group__time-area{
     width: 50%;
     display: flex;
     justify-content: space-between;
@@ -43,7 +38,6 @@
     padding: 0 15px 0 3px;
 }
 
-/* --- inputのデザイン --- */
 .form-input {
     border: 1px solid #E1E1E1;
     border-radius: 4px;
@@ -60,7 +54,6 @@
     border-color: #737373;
 }
 
-/* 時間入力の幅調整 */
 input[type="time"].form-input {
     width: 25%;
     text-align: center;
@@ -77,9 +70,8 @@ input[type="time"].form-input::-webkit-calendar-picker-indicator {
     font-weight: bold;
 }
 
-/* --- ボタンエリア --- */
+/* ボタン */
 
-/* 承認待ちメッセージ */
 .submit__button--disabled {
     color: #FF000080;
     font-size: 18px;

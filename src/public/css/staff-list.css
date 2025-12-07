@@ -1,7 +1,13 @@
+/* スタッフ一覧テーブル */
+
 .table th,
 .table td {
     padding: 15px;
     text-align: center;
+}
+
+.table tr:first-child{
+    border-bottom: 3px solid #E1E1E1 !important;
 }
 
 .header__name{
@@ -27,11 +33,12 @@
 }
 
 /* ページネーション */
+
 .pagination {
     display: flex;
     justify-content: center;
-    list-style: none;
     margin-top: 20px;
+    list-style: none;
 }
 
 .pagination li:not(.active) {

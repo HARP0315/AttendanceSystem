@@ -1,6 +1,10 @@
+/* 全体 */
+
 body{
     background-color: #fff !important;
 }
+
+/* メインコンテンツ */
 
 .verify-email {
     width: 100%;
@@ -38,6 +42,7 @@ body{
 }
 
 /* 再送ボタン */
+
 .verify-email__inner-resend-link {
     display: inline-block;
     margin-top:60px;
@@ -49,7 +54,8 @@ body{
     text-decoration: none;
 }
 
-/* 再送成功メッセージのスタイル */
+/* 再送成功メッセージ */
+
 .verify-email__success-message {
     margin-bottom: 20px;
     color: #28a745;

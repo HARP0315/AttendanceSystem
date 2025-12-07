@@ -1,5 +1,6 @@
 
 /* 月選択エリア */
+
 .attendance-nav {
     display: flex;
     justify-content: space-between;
@@ -16,6 +17,7 @@
 }
 
 /* カレンダーアイコン */
+
 .attendance__calendar {
     display: inline-block;
     position: relative;
@@ -29,7 +31,6 @@
     background-color: #f0f0f0;
 }
 
-/* input隠す */
 .attendance-input-hidden {
     position: absolute;
     top: 0;
@@ -46,7 +47,11 @@
     font-size: 18px;
 }
 
-/*  勤怠テーブル  */
+/*  勤怠一覧テーブル  */
+
+.table tr:first-child{
+    border-bottom: 3px solid #E1E1E1 !important;
+}
 
 .table th,
 .table td {
@@ -55,11 +60,12 @@
 }
 
 .table tr .header__date{
-    text-align: left;
     padding-left: 5%;
+    text-align: left;
 }
 
-.header__date,.header__name{
+.header__date,
+.header__name{
     width: 20%;
 }
 
@@ -73,6 +79,7 @@
 }
 
 /* CSVボタン */
+
 .export__btn{
     padding: 5px 40px;
 }

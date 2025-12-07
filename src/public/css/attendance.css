@@ -1,9 +1,11 @@
 /* 全体 */
+
 .container {
     padding-top: 160px;
 }
 
-/* 勤務状態 */
+/* 勤務ステータス */
+
 .attendance__status {
     display: inline-block;
     margin-bottom: 25px;
@@ -15,28 +17,26 @@
     font-weight: bold;
 }
 
-/* 日付 */
+/* 各パーツ */
 .date {
     margin: 5px 0 15px;
     font-size: 40px;
     font-weight: 400;
 }
 
-/* 時計 */
 #clock{
     margin: 40px 0 80px;
     font-size: 80px;
     font-weight: bold;
 }
 
-/* ボタンの並び */
+/* ボタン*/
 form {
     display: flex;
     justify-content: center;
     gap:70px;
 }
 
-/* 黒ボタン */
 .attendance__btn {
     width: 220px;
     padding: 10px 0;
@@ -54,7 +54,6 @@ form {
     opacity: 0.85;
 }
 
-/* 白ボタン */
 .btn--white {
     background-color: #fff;
     color: #000;
@@ -65,6 +64,7 @@ form {
 }
 
 /* 退勤済メッセージ */
+
 .work-end__massage {
     margin-top: 120px;
     font-size: 26px;
