@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->date('work_date');
+            $table->date('work_date')->nullable();
             $table->time('work_start_time')->nullable();
             $table->time('work_end_time')->nullable();
             $table->string('reason',255)->nullable();
-            $table->tinyInteger('status'); // 1:出勤中, 2: 休憩中, 3: 退勤済み
+            $table->tinyInteger('status')->nullable(); // 1:出勤中, 2: 休憩中, 3: 退勤済み
             $table->tinyInteger('is_deleted')->default(0); //1:削除済み
-            $table->unique(['user_id', 'work_date','is_deleted']);
+            $table->unique(['user_id', 'work_date']);
             $table->timestamps();
         });
     }

@@ -22,7 +22,7 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 // ---------------------------
 // スタッフ用
 // ---------------------------
-Route::prefix('')->middleware(['auth','staff.verified'])->group(function () {
+Route::prefix('')->middleware(['auth','staff.only','staff.verified'])->group(function () {
     Route::get('/attendance', [StaffAttendanceController::class, 'index'])->name('attendance.view');
     Route::post('/attendance', [StaffAttendanceController::class, 'store'])->name('attendance.store');
     Route::get('/attendance/list', [StaffAttendanceController::class, 'monthlyAttendance'])->name('attendance.monthly');
@@ -34,7 +34,7 @@ Route::prefix('')->middleware(['auth','staff.verified'])->group(function () {
 // ---------------------------
 // 管理者用
 // ---------------------------
-Route::prefix('admin')->middleware(['auth'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'admin.only'])->group(function () {
     Route::get('/attendance/list', [AdminAttendanceController::class, 'dailyAttendance'])->name('admin.attendance.list');
     Route::get('/attendance/{attendance_id?}', [AdminAttendanceController::class, 'attendanceDetail'])->name('admin.attendance.detail');
     Route::post('/attendance/{attendance_id?}', [AdminAttendanceController::class, 'attendanceDetailUpdate'])->name('admin.attendance.detail.update');

@@ -383,7 +383,7 @@ class StaffAttendanceManagementTest extends TestCase
     //【test】 「承認待ち」にログインユーザーが行った申請が全て表示されていること
     public function test_pending_list_is_displayed_for_staff()
     {
-        $user = User::factory()->create(['role' => 0]);
+        $user = User::factory()->create(['role' => 1]);
 
         //【check】 申請一覧に自分の申請が全て表示されている
         CorrectionRequest::factory()->count(2)->create([
@@ -404,7 +404,7 @@ class StaffAttendanceManagementTest extends TestCase
     //【test】 「承認済み」に管理者が承認した修正申請が全て表示されている
     public function test_approved_list_is_displayed_for_staff()
     {
-        $user = User::factory()->create(['role' => 0]);
+        $user = User::factory()->create(['role' => 1]);
 
         //【check】 承認済みに管理者が承認した申請が全て表示されている
         CorrectionRequest::factory()->create([
@@ -425,7 +425,7 @@ class StaffAttendanceManagementTest extends TestCase
     //【test】 各申請の「詳細」を押下すると勤怠詳細画面に遷移する
     public function test_transitions_to_attendance_detail()
     {
-        $user = User::factory()->create(['role' => 0]);
+        $user = User::factory()->create(['role' => 1]);
 
         //【check】 勤怠詳細画面に遷移する
         $attendance = Attendance::factory()->create([

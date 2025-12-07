@@ -249,11 +249,16 @@ class AdminAttendanceController extends Controller
             // すべて null の場合
             if ($allWorkNull && $allBreaksNull) {
                 $attendance->update([
+                    'work_date' => null,
                     'work_start_time' => null,
                     'work_end_time'   => null,
                     'reason'         => $form['reason'],
+                    'status'         => null,
                     'is_deleted'     => 1, //削除
                 ]);
+
+                $attendance->breakRecords()->delete();
+
             } else {
                 // 通常更新（勤務済）
                 $attendance->update([
@@ -262,20 +267,20 @@ class AdminAttendanceController extends Controller
                     'status'         => 3, // 退勤済
                     'reason'         => $form['reason'],
                 ]);
-            }
 
-            // 休憩は一旦削除して作り直す
-            $attendance->breakRecords()->delete();
+                // 休憩は一旦削除して作り直す
+                $attendance->breakRecords()->delete();
 
-            foreach ($breaks as $break) {
-                $start = $break['break_start_time'] ?? null;
-                $end   = $break['break_end_time'] ?? null;
+                foreach ($breaks as $break) {
+                    $start = $break['break_start_time'] ?? null;
+                    $end   = $break['break_end_time'] ?? null;
 
-                if ($start && $end) {
-                    $attendance->breakRecords()->create([
-                        'break_start_time' => $start,
-                        'break_end_time'   => $end,
-                    ]);
+                    if ($start && $end) {
+                        $attendance->breakRecords()->create([
+                            'break_start_time' => $start,
+                            'break_end_time'   => $end,
+                        ]);
+                    }
                 }
             }
 
@@ -521,33 +526,39 @@ class AdminAttendanceController extends Controller
 
             if ($allNull) {
                 $attendance->update([
+                    'work_date' => null,
                     'work_start_time' => null,
                     'work_end_time'   => null,
                     'reason'          => $correctionRequest->reason,
+                    'status'         => null,
                     'is_deleted'      => 1,
                 ]);
+
+                // 休憩削除→再作成
+                $attendance->breakRecords()->delete();
 
             } else {
 
                 $attendance->update([
+                    'work_date' => null,
                     'work_start_time' => $attendanceCorrection->work_start_time,
                     'work_end_time'   => $attendanceCorrection->work_end_time,
                     'reason'          => $correctionRequest->reason,
                     'status'          => 3,
                 ]);
-            }
 
-            // 休憩削除→再作成
-            $attendance->breakRecords()->delete();
+                // 休憩削除→再作成
+                $attendance->breakRecords()->delete();
 
-            foreach ($breakCorrections as $b) {
-                $start = $b->break_start_time;
-                $end   = $b->break_end_time;
+                foreach ($breakCorrections as $b) {
+                    $start = $b->break_start_time;
+                    $end   = $b->break_end_time;
 
-                $attendance->breakRecords()->create([
-                    'break_start_time' => $start,
-                    'break_end_time'   => $end,
-                ]);
+                    $attendance->breakRecords()->create([
+                        'break_start_time' => $start,
+                        'break_end_time'   => $end,
+                    ]);
+                }
             }
 
         } else {
