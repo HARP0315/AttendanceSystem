@@ -132,6 +132,7 @@
                 <button type="submit" class="submit__button">修正</button>
             </div>
             <input type="hidden" name="updated_at" value="{{ $attendance?->updated_at }}">
+            <input type="hidden" name="back_url" value="{{ url()->previous() }}">
         </form>
     @else
         <table class="table">
