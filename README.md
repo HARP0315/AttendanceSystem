@@ -138,25 +138,25 @@ no matching manifest for linux/arm64/v8 in the manifest list entries という�
 
 - **テスト実行前の準備 (初回のみ)**:
 
-  - テスト用のデータベース／テーブルを作成します。
+テスト用のデータベース／テーブルを作成します。
 
-    ```bash
-    # 1. PHPコンテナに入る
-    docker-compose exec mysql bash
+  ```bash
+  # 1. PHPコンテナに入る
+  docker-compose exec mysql bash
 
-    # 2. MySQLクライアントに接続する
-    (パスワードを求められたら `docker-compose.yml`ファイルの MYSQL_ROOT_PASSWORD を入力)
-    mysql -h mysql -u root -p
+  # 2. MySQLクライアントに接続する
+  (パスワードを求められたら `docker-compose.yml`ファイルの MYSQL_ROOT_PASSWORD を入力)
+  mysql -h mysql -u root -p
 
-    # 3. MySQLプロンプトで、テスト用データベースを作成する
-    CREATE DATABASE test_database;
+  # 3. MySQLプロンプトで、テスト用データベースを作成する
+  CREATE DATABASE test_database;
 
-    # 4. MySQLクライアントを終了する
-    exit;
+  # 4. MySQLクライアントを終了する
+  exit;
 
-    # 5. PHPコンテナ内でテーブルを作成する
-    php artisan migrate:fresh --env=testing
-    ```
+  # 5. PHPコンテナ内でテーブルを作成する
+  php artisan migrate:fresh --env=testing
+  ```
 
 - **実行**: PHPコンテナ内で以下のコマンドを実行します。
 
