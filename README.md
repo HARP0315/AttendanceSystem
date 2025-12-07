@@ -142,7 +142,7 @@ no matching manifest for linux/arm64/v8 in the manifest list entries という�
 
   ```bash
   # 1. MySQLコンテナに入る
-  docker-compose exec mysql bash
+  docker compose exec mysql bash
 
   # 2. MySQLクライアントに接続する
   (パスワードを求められたら `docker-compose.yml`ファイルの MYSQL_ROOT_PASSWORD を入力)
@@ -158,6 +158,7 @@ no matching manifest for linux/arm64/v8 in the manifest list entries という�
   exit;
 
   # 6 PHPコンテナに入る
+  docker compose exec php bash
 
   # 7 テーブルを作成する
   php artisan migrate:fresh --env=testing
@@ -167,7 +168,6 @@ no matching manifest for linux/arm64/v8 in the manifest list entries という�
 
   ```bash
   # テスト実行
-  php artisan test
   php artisan test
   ```
 
