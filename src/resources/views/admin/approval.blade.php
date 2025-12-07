@@ -14,7 +14,7 @@
 
 <div class="container center">
     <h1 class="page__title">勤怠詳細</h1>
-    <form action="{{ url('admin/stamp_correction_request/approve/'. $correctionRequest->id) }}" method="post">
+    <form action="{{ route('admin.approval.update', ['correction_request_id' => $correctionRequest->id]) }}" method="post">
         @csrf
 
         <table class="table">

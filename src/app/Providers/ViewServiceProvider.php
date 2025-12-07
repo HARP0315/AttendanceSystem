@@ -27,7 +27,7 @@ class ViewServiceProvider extends ServiceProvider
             $user = Auth::user();
             $headerLink = null;
 
-            if ($user && $user->role === 1) { // スタッフだけ判定
+            if ($user && $user->role === 1) {
                 $today = Carbon::today()->toDateString();
                 $headerLink = Attendance::where('user_id', $user->id)
                                         ->where('work_date', $today)

@@ -24,7 +24,7 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 // ---------------------------
 Route::prefix('')->middleware(['auth','staff.only','staff.verified'])->group(function () {
     Route::get('/attendance', [StaffAttendanceController::class, 'index'])->name('attendance.view');
-    Route::post('/attendance', [StaffAttendanceController::class, 'store'])->name('attendance.store');
+    Route::post('/attendance', [StaffAttendanceController::class, 'attendanceCreate'])->name('attendance.store');
     Route::get('/attendance/list', [StaffAttendanceController::class, 'monthlyAttendance'])->name('attendance.monthly');
     Route::get('/attendance/detail/{attendance_id?}', [StaffAttendanceController::class, 'attendanceDetail'])->name('attendance.detail');
     Route::post('/attendance/detail/{attendance_id?}', [StaffAttendanceController::class, 'correctionRequestCreate'])->name('correction.request');

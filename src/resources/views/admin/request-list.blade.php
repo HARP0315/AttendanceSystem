@@ -40,7 +40,7 @@
                         <td  class="data__reason">{{ $req->reason }}</td>
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
                         <td class="data__detail">
-                            <a href="{{ url('admin/stamp_correction_request/approve/'.$req->id) }}">詳細</a>
+                            <a href="{{ route('admin.approval.view', ['correction_request_id' => $req->id]) }}">詳細</a>
                         </td>
                     </tr>
                 @endforeach
@@ -69,7 +69,7 @@
                         <td class="data__reason">{{ $req->reason }}</td>
                         <td>{{ $req->created_at->format('Y/m/d') }}</td>
                         <td class="data__detail">
-                            <a href="{{ url('admin/stamp_correction_request/approve/'.$req->id)}}">詳細</a>
+                            <a href="{{ route('admin.approval.view', ['correction_request_id' => $req->id]) }}">詳細</a>
                         </td>
                     </tr>
                 @endforeach
@@ -94,11 +94,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
-<style>
-.tab-button.active { font-weight: bold; border-bottom: 2px solid #007bff; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-</style>
 
 @endsection

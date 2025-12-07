@@ -22,9 +22,8 @@ class BreakTimeCorrectionFactory extends Factory
     public function definition(): array
     {
 
-        $start = $this->faker->time('H:i:s', '13:00:00');
-        $end = date('H:i:s', strtotime($start) + 30 * 60); // +30分
-
+        $start = $this->faker->time('H:i:s', '12:00:00');
+        $end = $this->faker->time('H:i:s', '13:00:00');
         return [
             'correction_request_id' => CorrectionRequest::factory(),
             'break_start_time' => $start,

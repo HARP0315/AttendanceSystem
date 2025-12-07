@@ -15,10 +15,10 @@
 <div class="container center">
     <h1 class="page__title">{{$user->name}}さんの勤怠一覧</h1>
     <div class="attendance-nav">
-        <a href="{{ url('admin/attendance/staff/'.$user->id.'?month='.$prevMonth) }}" class="attendance-nav__link">
+        <a href="{{ route('admin.monthly.attendance', ['id' => $user->id, 'month' => $prevMonth]) }}" class="attendance-nav__link">
             <i class="fa-solid fa-arrow-left"></i>前月
         </a>
-        <form method="get" action="{{ url('admin/attendance/staff/'.$user->id) }}" class="attendance-nav__link">
+        <form method="get" action="{{ route('admin.monthly.attendance', ['id' => $user->id]) }}" class="attendance-nav__link">
             <div class="attendance__calendar">
                 <i class="fa-regular fa-calendar-days"></i>
                 <input
@@ -31,7 +31,7 @@
             </div>
             <span class="date-label">{{ $currentMonth->format('Y/m') }}</span>
         </form>
-        <a href="{{ url('admin/attendance/staff/'.$user->id.'?month='.$nextMonth) }}" class="attendance-nav__link">
+        <a href="{{ route('admin.monthly.attendance', ['id' => $user->id, 'month' => $nextMonth]) }}" class="attendance-nav__link">
             翌月<i class="fa-solid fa-arrow-right"></i></a>
     </div>
 
@@ -54,9 +54,9 @@
                 <td>{{ $day['work_total'] ?? '' }}</td>
                 <td class="data__detail">
                     @if($day['attendance'])
-                        <a href="{{ url('/admin/attendance/'.($day['attendance']->id)) }}">詳細</a>
+                        <a href="{{ route('admin.attendance.detail', ['attendance_id' => $day['attendance']->id]) }}">詳細</a>
                     @else
-                        <a href="{{ url('/admin/attendance/') }}?date={{ $day['date'] }}">詳細</a>
+                        <a href="{{ route('admin.attendance.detail', ['date' => $day['date']]) }}">詳細</a>
                     @endif
                 </td>
             </tr>

@@ -17,11 +17,10 @@
 
     @if(!$correctionRequest)
         {{-- action は attendance の有無で分ける --}}
-        @if($attendance)
-            <form action="{{ url('admin/attendance/'.$attendance->id) }}" method="post">
-        @else
-            <form action="{{ url('admin/attendance/') }}" method="post">
-        @endif
+
+        <form action="{{ $attendance
+            ? route('admin.attendance.detail.update', ['attendance_id' => $attendance->id])
+            : route('admin.attendance.detail.update') }}" method="post">
             @csrf
 
             <div class=error-massage__area>
@@ -129,89 +128,87 @@
                         @enderror
                     </td>
                 </tr>
-
             </table>
 
             <div class="form-actions">
-                <button type="submit" class="submit__button">勤怠修正</button>
+                <button type="submit" class="submit__button">修正</button>
             </div>
             <input type="hidden" name="updated_at" value="{{ $attendance?->updated_at }}">
         </form>
-
     @else
         <table class="table">
-                    <tr>
-                        <th>名前</th>
-                        <td>{{ $user->name }}</td>
-                    </tr>
+            <tr>
+                <th>名前</th>
+                <td>{{ $user->name }}</td>
+            </tr>
 
-                    <tr>
-                        <th>日付</th>
-                        <td>
-                            <div class="data__date">
-                                <p>{{ \Carbon\Carbon::parse($workDate)->format('Y年') }}</p>
-                                <p>{{ \Carbon\Carbon::parse($workDate)->format('m月d日') }}</p>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>出勤・退勤</th>
-                        <td>
-                            <div class="group__time-area">
-                                <p class="time">
-                                    {{ $attendanceCorrection ? ($attendanceCorrection->work_start_time ? \Carbon\Carbon::parse($attendanceCorrection->work_start_time)->format('H:i') : '') : '' }}
-                                </p>
-                                <p>〜</p>
-                                <p class="time">
-                                    {{ $attendanceCorrection ? ($attendanceCorrection->work_end_time ? \Carbon\Carbon::parse($attendanceCorrection->work_end_time)->format('H:i') : '') : '' }}
-                                </p>
-                            </div>
-                        </td>
-                    </tr>
-
-                    {{-- 休憩一覧 --}}
-                    @php
-                        $breaks = $breakCorrections;
-                    @endphp
-
-                    @foreach($breaks as $index => $break)
-                    <tr>
-                        <th>{{ $index === 0 ? '休憩' : '休憩' . ($index + 1) }}</th>
-                        <td>
-                            <div class="group__time-area">
-                                <p class="time">
-                                    {{ is_object($break)
-                                        ?($break->break_start_time ? \Carbon\Carbon::parse($break->break_start_time)->format('H:i') : '')
-                                        : ($break['break_start_time'] ? \Carbon\Carbon::parse($break['break_start_time'])->format('H:i') : '') }}
-                                </p>
-                                <p>〜</p>
-                                <p class="time">
-                                    {{ is_object($break)
-                                        ? ($break->break_end_time ? \Carbon\Carbon::parse($break->break_end_time)->format('H:i') : '')
-                                        : ($break['break_end_time'] ? \Carbon\Carbon::parse($break['break_end_time'])->format('H:i') : '') }}
-                                </p>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-
-                    <tr>
-                        <th>備考</th>
-                        <td>
-                            <p class="reason">
-                                {{ $correctionRequest ? ($correctionRequest->reason ?? '') : '' }}
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-
-                {{-- 承認待ちの時は擬似ボタン --}}
-                <div class="form-actions">
-                    <div class="submit__button--disabled">
-                        <p>*修正承認待ちのため修正はできません。</p>
+            <tr>
+                <th>日付</th>
+                <td>
+                    <div class="data__date">
+                        <p>{{ \Carbon\Carbon::parse($workDate)->format('Y年') }}</p>
+                        <p>{{ \Carbon\Carbon::parse($workDate)->format('m月d日') }}</p>
                     </div>
-                </div>
+                </td>
+            </tr>
+
+            <tr>
+                <th>出勤・退勤</th>
+                <td>
+                    <div class="group__time-area">
+                        <p class="time">
+                            {{ $attendanceCorrection ? ($attendanceCorrection->work_start_time ? \Carbon\Carbon::parse($attendanceCorrection->work_start_time)->format('H:i') : '') : '' }}
+                        </p>
+                        <p>〜</p>
+                        <p class="time">
+                            {{ $attendanceCorrection ? ($attendanceCorrection->work_end_time ? \Carbon\Carbon::parse($attendanceCorrection->work_end_time)->format('H:i') : '') : '' }}
+                        </p>
+                    </div>
+                </td>
+            </tr>
+
+            {{-- 休憩一覧 --}}
+            @php
+                $breaks = $breakCorrections;
+            @endphp
+
+            @foreach($breaks as $index => $break)
+            <tr>
+                <th>{{ $index === 0 ? '休憩' : '休憩' . ($index + 1) }}</th>
+                <td>
+                    <div class="group__time-area">
+                        <p class="time">
+                            {{ is_object($break)
+                                ?($break->break_start_time ? \Carbon\Carbon::parse($break->break_start_time)->format('H:i') : '')
+                                : ($break['break_start_time'] ? \Carbon\Carbon::parse($break['break_start_time'])->format('H:i') : '') }}
+                        </p>
+                        <p>〜</p>
+                        <p class="time">
+                            {{ is_object($break)
+                                ? ($break->break_end_time ? \Carbon\Carbon::parse($break->break_end_time)->format('H:i') : '')
+                                : ($break['break_end_time'] ? \Carbon\Carbon::parse($break['break_end_time'])->format('H:i') : '') }}
+                        </p>
+                    </div>
+                </td>
+            </tr>
+            @endforeach
+
+            <tr>
+                <th>備考</th>
+                <td>
+                    <p class="reason">
+                        {{ $correctionRequest ? ($correctionRequest->reason ?? '') : '' }}
+                    </p>
+                </td>
+            </tr>
+        </table>
+
+        {{-- 承認待ちの時は擬似ボタン --}}
+        <div class="form-actions">
+            <div class="submit__button--disabled">
+                <p>*修正承認待ちのため修正はできません。</p>
+            </div>
+        </div>
     @endif
 </div>
 @endsection

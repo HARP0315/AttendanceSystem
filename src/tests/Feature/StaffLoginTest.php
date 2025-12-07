@@ -13,12 +13,14 @@ class StaffLoginTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * スタッフのログインに関するテスト
+     * 【test】メールアドレスが未入力の場合、バリデーションメッセージが表示される
+     * 【test】パスワードが未入力の場合、バリデーションメッセージが表示される
+     * 【test】登録内容と一致しない場合、バリデーションメッセージが表示される
      * @return void
      */
     public function test_staff_login_validation_and_failure()
     {
-        //【test】メールアドレスが未入力の場合、バリデーションメッセージが表示される
+        //【check】 「メールアドレスを入力してください」というバリデーションメッセージが表示される
         $response = $this->post('/login', [
             'email' => '',
             'password' => 'password123',
@@ -28,7 +30,7 @@ class StaffLoginTest extends TestCase
             'email' => 'メールアドレスを入力してください',
         ]);
 
-        //【test】パスワードが未入力の場合、バリデーションメッセージが表示される
+        //【check】 「パスワードを入力してください」というバリデーションメッセージが表示される
         $response = $this->post('/login', [
             'email' => 'test@example.com',
             'password' => '',
@@ -38,7 +40,7 @@ class StaffLoginTest extends TestCase
             'password' => 'パスワードを入力してください',
         ]);
 
-        //【test】登録内容と一致しない場合、バリデーションメッセージが表示される
+        //【check】 「ログイン情報が登録されていません」というバリデーションメッセージが表示される
         $user = User::factory()->create([
             'email' => 'test@example.com',
             'password' => Hash::make('correct-password'),
@@ -54,5 +56,4 @@ class StaffLoginTest extends TestCase
             'email' => 'ログイン情報が登録されていません',
         ]);
     }
-
 }

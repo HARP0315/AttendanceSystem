@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class StaffOnly
 {
     /**
-     * Handle an incoming request.
+     * スタッフ用の承認機能の管理
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */

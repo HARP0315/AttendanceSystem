@@ -92,6 +92,7 @@ header{
 
 .error-message{
     margin-top: 8px;
+    text-align: left;
     color: #ff333f;
     font-size: 14px;
     font-weight: bold;

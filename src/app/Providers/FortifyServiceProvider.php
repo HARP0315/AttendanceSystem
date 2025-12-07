@@ -15,11 +15,8 @@ use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Fortify;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Http\Requests\LoginRequest;
 use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;
-use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use App\Actions\Fortify\LoginResponse;
 use App\Actions\Fortify\LogoutResponse;
 
@@ -95,26 +92,19 @@ class FortifyServiceProvider extends ServiceProvider
 
             if ($user && Hash::check($request->password, $user->password)) {
 
-                // アドミン画面 からは管理者だけログインできる
                 if ($request->is('admin/*') && $user->role !== 0) {
                     return null;
                 }
-                // スタッフ画面 からはスタッフだけログインできる
+
                 if (! $request->is('admin/*') && $user->role !== 1) {
                     return null;
                 }
 
-                // 認証成功
                 return $user;
             }
 
             return null;
         });
-
-        // ----------------------------------------
-        // リダイレクト（遷移）制御
-        // ----------------------------------------
-
 
         // ログイン後レスポンス
         $this->app->singleton(

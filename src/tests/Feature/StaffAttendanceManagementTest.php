@@ -401,7 +401,10 @@ class StaffAttendanceManagementTest extends TestCase
         $response->assertSee('テスト申請');
     }
 
-    //【test】 「承認済み」に管理者が承認した修正申請が全て表示されている
+    /**
+     * 【test】 「承認済み」に管理者が承認した修正申請が全て表示されている
+     * @return void
+     */
     public function test_approved_list_is_displayed_for_staff()
     {
         $user = User::factory()->create(['role' => 1]);
@@ -422,7 +425,10 @@ class StaffAttendanceManagementTest extends TestCase
         $response->assertSee('承認済み申請');
     }
 
-    //【test】 各申請の「詳細」を押下すると勤怠詳細画面に遷移する
+    /**
+     * 【test】 各申請の「詳細」を押下すると勤怠詳細画面に遷移する
+     * @return void
+     */
     public function test_transitions_to_attendance_detail()
     {
         $user = User::factory()->create(['role' => 1]);
@@ -450,5 +456,4 @@ class StaffAttendanceManagementTest extends TestCase
         $detail->assertStatus(200);
         $detail->assertSee($user->name);
     }
-
 }

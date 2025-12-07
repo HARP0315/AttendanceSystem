@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class LogoutResponse implements LogoutResponseContract
 {
     /**
-     * Handle the logout response.
+     * 管理者とスタッフでログアウト後の遷移先をコントロール
      */
     public function toResponse($request)
     {

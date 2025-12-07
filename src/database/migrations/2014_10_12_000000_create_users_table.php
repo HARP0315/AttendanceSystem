@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
-            $table->tinyInteger('role')->default(1);//0:管理者, 1:一般
+            $table->tinyInteger('role')->default(1);//0:管理者, 1:スタッフ
         });
     }
 

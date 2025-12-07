@@ -16,7 +16,10 @@ class AdminAttendanceManagementTest extends TestCase
 
     use RefreshDatabase;
 
-    //【test】 その日になされた全ユーザーの勤怠情報が正確に確認できる
+    /**
+     * 【test】 その日になされた全ユーザーの勤怠情報が正確に確認できる
+     * @return void
+     */
     public function test_daily_attendance_is_displayed()
     {
         $today = Carbon::today()->format('Y-m-d');
@@ -55,7 +58,11 @@ class AdminAttendanceManagementTest extends TestCase
         $response->assertSee('10:00');
     }
 
-    //【test】 遷移した際に現在の日付が表示される
+    /**
+     * 【test】 遷移した際に現在の日付が表示される
+     *
+     * @return void
+     */
     public function test_daily_attendance_today_date_is_displayed()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -71,7 +78,10 @@ class AdminAttendanceManagementTest extends TestCase
         $response->assertSee($today);
     }
 
-    //【test】 「前日」を押下した時に前の日の勤怠情報が表示される
+    /**
+     * 【test】 「前日」を押下した時に前の日の勤怠情報が表示される
+     * @return void
+     */
     public function test_daily_attendance_prev_day_is_displayed()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -99,7 +109,10 @@ class AdminAttendanceManagementTest extends TestCase
         $response->assertSee('09:00');
     }
 
-    //【test】 「翌日」を押下した時に次の日の勤怠情報が表示される
+    /**
+     * 【test】 「翌日」を押下した時に次の日の勤怠情報が表示される
+     * @return void
+     */
     public function test_daily_attendance_next_day_is_displayed()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -127,7 +140,10 @@ class AdminAttendanceManagementTest extends TestCase
         $response->assertSee('10:00');
     }
 
-    //【test】 勤怠詳細画面に表示されるデータが選択したものになっている
+    /**
+     * 【test】 勤怠詳細画面に表示されるデータが選択したものになっている
+     * @return void
+     */
     public function test_attendance_detail_correct_data_is_displayed()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -157,7 +173,10 @@ class AdminAttendanceManagementTest extends TestCase
         $response->assertSee('通常勤務');
     }
 
-    //【test】 出勤時間が退勤時間より後になっている場合、エラーメッセージが表示される
+    /**
+     * 【test】 出勤時間が退勤時間より後になっている場合、エラーメッセージが表示される
+     * @return void
+     */
     public function test_attendance_detail_start_time_after_end_time()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -186,7 +205,10 @@ class AdminAttendanceManagementTest extends TestCase
         $response->assertSessionHasErrors(['work_start_time' => '出勤時間もしくは退勤時間が不適切な値です']);
     }
 
-    //【test】 休憩開始時間が退勤時間より後になっている場合、エラーメッセージが表示される
+    /**
+     * 【test】 休憩開始時間が退勤時間より後になっている場合、エラーメッセージが表示される
+     * @return void
+     */
     public function test_attendance_detail_break_start_after_end_time()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -217,7 +239,10 @@ class AdminAttendanceManagementTest extends TestCase
         $response->assertSessionHasErrors(['breaks.0.break_start_time' => '休憩時間が不適切な値です']);
     }
 
-    //【test】 休憩終了時間が退勤時間より後になっている場合、エラーメッセージが表示される
+    /**
+     * 【test】 休憩終了時間が退勤時間より後になっている場合、エラーメッセージが表示される
+     * @return void
+     */
     public function test_attendance_detail_break_end_after_end_time()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -248,7 +273,10 @@ class AdminAttendanceManagementTest extends TestCase
         $response->assertSessionHasErrors(['breaks.0.break_end_time' => '休憩時間もしくは退勤時間が不適切な値です']);
     }
 
-    //【test】 備考欄が未入力の場合のエラーメッセージが表示される
+    /**
+     * 【test】 備考欄が未入力の場合のエラーメッセージが表示される
+     * @return void
+     */
     public function test_error_when_reason_is_empty()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -277,7 +305,10 @@ class AdminAttendanceManagementTest extends TestCase
         $response->assertSessionHasErrors(['reason'=>'備考を記入してください']);
     }
 
-    //【test】 管理者ユーザーが全一般ユーザーの「氏名」「メールアドレス」を確認できる
+    /**
+     * 【test】 管理者ユーザーが全一般ユーザーの「氏名」「メールアドレス」を確認できる
+     * @return void
+     */
     public function test_staff_list_is_displayed()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -296,7 +327,11 @@ class AdminAttendanceManagementTest extends TestCase
         }
     }
 
-    //【test】 ユーザーの勤怠情報が正しく表示される
+    /**
+     * 【test】 ユーザーの勤怠情報が正しく表示される
+     *
+     * @return void
+     */
     public function test_monthly_attendance_is_displayed()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -322,7 +357,10 @@ class AdminAttendanceManagementTest extends TestCase
         $response->assertSee('18:00');
     }
 
-    //【test】 「前月」を押下した時に表示月の前月の情報が表示される
+    /**
+     * 【test】 「前月」を押下した時に表示月の前月の情報が表示される
+     * @return void
+     */
     public function test_monthly_attendance_prev_month_is_displayed()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -342,7 +380,11 @@ class AdminAttendanceManagementTest extends TestCase
 
     }
 
-    //【test】 「翌月」を押下した時に表示月の前月の情報が表示される
+    /**
+     * 【test】 「翌月」を押下した時に表示月の前月の情報が表示される
+     *
+     * @return void
+     */
     public function test_monthly_attendance_next_month_si_displayed()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -362,7 +404,10 @@ class AdminAttendanceManagementTest extends TestCase
 
     }
 
-    //【test】 「詳細」を押下すると、その日の勤怠詳細画面に遷移する
+    /**
+     * 【test】 「詳細」を押下すると、その日の勤怠詳細画面に遷移する
+     * @return void
+     */
     public function test_monthly_attendance_transitions_to_daily_detail()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -389,7 +434,10 @@ class AdminAttendanceManagementTest extends TestCase
 
     }
 
-    //【test】 承認待ちの修正申請が全て表示されている
+    /**
+     * 【test】 承認待ちの修正申請が全て表示されている
+     * @return void
+     */
     public function test_pending_requests_is_displayed_for_admin()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -427,7 +475,10 @@ class AdminAttendanceManagementTest extends TestCase
         $response->assertSee($user->name);
     }
 
-    //【test】 承認済みの修正申請が全て表示されている
+    /**
+     * 【test】 承認済みの修正申請が全て表示されている
+     * @return void
+     */
     public function test_approved_requests_is_displayed_for_admin()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -451,9 +502,11 @@ class AdminAttendanceManagementTest extends TestCase
         $response->assertSee($user->name);
     }
 
-
-    //【test】 修正申請の詳細内容が正しく表示されている
-    //【test】 修正申請の承認処理が正しく行われる
+    /**
+     * 【test】 修正申請の詳細内容が正しく表示されている
+     * 【test】 修正申請の承認処理が正しく行われる
+     * @return void
+     */
     public function test_detail_and_approval_of_correction_request()
     {
         $admin = User::factory()->create(['role' => 0]);
@@ -501,5 +554,4 @@ class AdminAttendanceManagementTest extends TestCase
             'request_status' => 2,
         ]);
     }
-
 }

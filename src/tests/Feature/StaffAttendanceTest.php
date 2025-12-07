@@ -10,13 +10,11 @@ use App\Models\User;
 use App\Models\Attendance;
 use App\Models\BreakTime;
 
-//TODO response全部繋げてもいいかも
 class StaffAttendanceTest extends TestCase
 {
     use RefreshDatabase;
 
     /**
-     * 日時取得機能 関連のテスト
      * 【test】 現在の日時情報がUIと同じ形式で出力されている
      * @return void
      */
@@ -39,21 +37,26 @@ class StaffAttendanceTest extends TestCase
         $response->assertSee($todayStr);
     }
 
+    /**
+     * 【test】 勤務外の場合、勤怠ステータスが正しく表示される
+     * 【test】 出勤中の場合、勤怠ステータスが正しく表示される
+     * 【test】 休憩中の場合、勤怠ステータスが正しく表示される
+     * 【test】 退勤済の場合、勤怠ステータスが正しく表示される
+     * @return void
+     */
     public function test_attendance_status_display()
     {
         $user = User::factory()->create(['role' => 1]);
         $this->actingAs($user);
 
-        //【test】 勤務外の場合、勤怠ステータスが正しく表示される
-        //画面上に表示されているステータスが「勤務外」となる
+        //【check】 画面上に表示されているステータスが「勤務外」となる
         $response = $this->get('/attendance');
         $response->assertStatus(200);
 
         //検証
         $response->assertSee('勤務外');
 
-        //【test】 出勤中の場合、勤怠ステータスが正しく表示される
-        //画面上に表示されているステータスが「出勤中」となる
+        //【check】 画面上に表示されているステータスが「出勤中」となる
         $attendance = Attendance::factory()->create([
             'user_id' => $user->id,
             'work_date' => now()->format('Y-m-d'),
@@ -66,16 +69,14 @@ class StaffAttendanceTest extends TestCase
         //検証
         $response->assertSee('出勤中');
 
-        //【test】 休憩中の場合、勤怠ステータスが正しく表示される
-        //画面上に表示されているステータスが「休憩中」となる
+        //【check】 画面上に表示されているステータスが「休憩中」となる
         $attendance->update(['status' => 2]);
         $response = $this->get('/attendance');
 
         //検証
         $response->assertSee('休憩中');
 
-        //【test】 退勤済の場合、勤怠ステータスが正しく表示される
-        //画面上に表示されているステータスが「退勤済」となる
+        //【check】 画面上に表示されているステータスが「退勤済」となる
         $attendance->update([
             'status' => 3,
             'work_end_time' => '18:00:00'
@@ -86,6 +87,12 @@ class StaffAttendanceTest extends TestCase
         $response->assertSee('退勤済');
     }
 
+    /**
+     * 【test】 出勤ボタンが正しく機能する
+     * 【test】 出勤は一日一回のみできる
+     * 【test】 出勤時刻が勤怠一覧画面で確認できる
+     * @return void
+     */
     public function test_work_start_function()
     {
 
@@ -95,8 +102,7 @@ class StaffAttendanceTest extends TestCase
         $response = $this->get('/attendance');
         $response->assertStatus(200);
 
-        //【test】 出勤ボタンが正しく機能する
-        //画面上に「出勤」ボタンが表示され、処理後に画面上に表示されるステータスが「出勤中」になる
+        //【check】 画面上に「出勤」ボタンが表示され、処理後に画面上に表示されるステータスが「出勤中」になる
         $response->assertSee('出勤');
 
         $response = $this->post('/attendance', ['action' => 'work_start']);
@@ -106,8 +112,7 @@ class StaffAttendanceTest extends TestCase
         //検証
         $redirectResponse->assertSee('出勤中');
 
-        //【test】 出勤は一日一回のみできる
-        //画面上に「出勤」ボタンが表示されない
+        //【check】 画面上に「出勤」ボタンが表示されない
         $attendance = Attendance::where('user_id', $user->id)
                                 ->where('work_date', now()->format('Y-m-d'))
                                 ->first();
@@ -121,10 +126,11 @@ class StaffAttendanceTest extends TestCase
         $response->assertStatus(200);
 
         //検証
-        $response->assertDontSee('<button name="action" value="work_start" class="attendance__btn">出勤</button>');
+        $response->assertDontSee(
+            '<button name="action" value="work_start" class="attendance__btn">出勤</button>'
+        );
 
-        //【test】 出勤時刻が勤怠一覧画面で確認できる
-        //勤怠一覧画面に出勤時刻が正確に記録されている
+        //【check】 勤怠一覧画面に出勤時刻が正確に記録されている
         $attendance->update([
             'status' => 1,
             'work_end_time' => null,
@@ -141,6 +147,14 @@ class StaffAttendanceTest extends TestCase
         $response->assertSee($startTime);
     }
 
+    /**
+     * 【test】 休憩ボタンが正しく機能する
+     * 【test】 休憩戻ボタンが正しく機能する
+     * 【test】 休憩は一日に何回でもできる
+     * 【test】 休憩戻は一日に何回でもできる
+     * 【test】 休憩時刻が勤怠一覧画面で確認できる
+     * @return void
+     */
     public function test_break_button_function()
     {
         $user = User::factory()->create(['role' => 1]);
@@ -153,8 +167,7 @@ class StaffAttendanceTest extends TestCase
         ]);
         $this->actingAs($user);
 
-        //【test】 休憩ボタンが正しく機能する
-        //画面上に「休憩入」ボタンが表示され、処理後に画面上に表示されるステータスが「休憩中」になる
+        //【check】 画面上に「休憩入」ボタンが表示され、処理後に画面上に表示されるステータスが「休憩中」になる
         $response = $this->get('/attendance');
         $response->assertSee('休憩入');
 
@@ -166,10 +179,8 @@ class StaffAttendanceTest extends TestCase
         //検証
         $response->assertSee('休憩中');
 
-        //【test】 休憩戻ボタンが正しく機能する
-        //休憩戻ボタンが表示され、処理後にステータスが「出勤中」に変更される
-        //【test】 休憩は一日に何回でもできる
-        //画面上に「休憩入」ボタンが表示される
+        //【check】 休憩戻ボタンが表示され、処理後にステータスが「出勤中」に変更される
+        //【check】 画面上に「休憩入」ボタンが表示される
         $response->assertSee('休憩戻');
         $response = $this->post('/attendance', ['action' => 'break_end']);
         $response->assertRedirect('/attendance');
@@ -181,8 +192,7 @@ class StaffAttendanceTest extends TestCase
         $response->assertSee('出勤中');
         $response->assertSee('休憩入');
 
-        //【test】 休憩戻は一日に何回でもできる
-        //画面上に「休憩戻」ボタンが表示される
+        //【check】 画面上に「休憩戻」ボタンが表示される
         $response = $this->post('/attendance', ['action' => 'break_start']);
         $response->assertRedirect('/attendance');
 
@@ -192,8 +202,7 @@ class StaffAttendanceTest extends TestCase
         //検証
         $response->assertSee('休憩戻');
 
-        //【test】 休憩時刻が勤怠一覧画面で確認できる
-        //勤怠一覧画面に休憩時刻（合計）が正確に記録されている
+        //【check】 勤怠一覧画面に休憩時刻（合計）が正確に記録されている
         $response = $this->post('/attendance', ['action' => 'break_end']);
         $break = BreakTime::where('attendance_id', $attendance->id)->latest()->first();
 
@@ -211,12 +220,15 @@ class StaffAttendanceTest extends TestCase
 
     }
 
+    /**
+     * 【test】 退勤ボタンが正しく機能する
+     * @return void
+     */
     public function test_work_end_function()
     {
         $user = User::factory()->create(['role' => 1]);
 
-        //【test】 退勤ボタンが正しく機能する
-        //画面上に「退勤」ボタンが表示され、処理後に画面上に表示されるステータスが「退勤済」になる
+        //【check】 画面上に「退勤」ボタンが表示され、処理後に画面上に表示されるステータスが「退勤済」になる
         $attendance = Attendance::factory()->create([
             'user_id'         => $user->id,
             'work_date'       => now()->format('Y-m-d'),
@@ -243,15 +255,14 @@ class StaffAttendanceTest extends TestCase
     }
 
     /**
-     *
+     * 【test】 退勤時刻が勤怠一覧画面で確認できる
      */
     public function test_work_end_time_appears_in_list()
     {
         $user = User::factory()->create(['role' => 1]);
         $this->actingAs($user);
 
-        //【test】 退勤時刻が勤怠一覧画面で確認できる
-        //勤怠一覧画面に退勤時刻が正確に記録されている
+        //【check】 勤怠一覧画面に退勤時刻が正確に記録されている
         $this->post('/attendance', ['action' => 'work_start']);
 
         $attendance = Attendance::where('user_id', $user->id)->first();
@@ -262,14 +273,12 @@ class StaffAttendanceTest extends TestCase
 
         $this->post('/attendance', ['action' => 'work_end']);
 
-        //勤怠一覧を表示
         $response = $this->get('/attendance/list');
         $response->assertStatus(200);
 
         $workEnd = $fixedEnd->format('H:i');
         $response->assertSee($workEnd);
 
-        // 時間の固定を解除
         Carbon::setTestNow();
     }
 }

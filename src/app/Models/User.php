@@ -14,7 +14,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * The attributes that are mass assignable.
-     * roleでユーザー権限を管理
      *
      * @var array<int, string>
      */
@@ -49,11 +48,6 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany('App\Models\Attendance');
     }
-
-    // public function breakTimes()
-    // {
-    //     return $this->hasMany('App\Models\BreakTime');
-    // }
 
     public function correctionRequests()
     {

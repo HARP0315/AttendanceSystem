@@ -16,10 +16,10 @@
         <h1 class="page__title">{{ $currentDay->format('Y年m月d日') }}の勤怠</h1>
 
         <div class="attendance-nav">
-        <a href="{{ url('admin/attendance/list?date='.$prevDay) }}" class="attendance-nav__link">
+        <a href="{{ route('admin.attendance.list', ['date' => $prevDay]) }}" class="attendance-nav__link">
             <i class="fa-solid fa-arrow-left"></i>前日
         </a>
-        <form method="get" action="{{ url('admin/attendance/list') }}" class="attendance-nav__link">
+        <form method="get" action="{{ route('admin.attendance.list') }}" class="attendance-nav__link">
             <div class="attendance__calendar">
                 <i class="fa-regular fa-calendar-days"></i>
                 <input
@@ -32,7 +32,7 @@
             </div>
             <span class="date-label">{{ $currentDay->format('Y/m/d') }}</span>
         </form>
-        <a href="{{ url('admin/attendance/list?date='.$nextDay) }}" class="month-nav__link">
+        <a href="{{ route('admin.attendance.list', ['date' => $nextDay]) }}" class="month-nav__link">
             翌日<i class="fa-solid fa-arrow-right"></i></a>
     </div>
 
@@ -53,11 +53,7 @@
                 <td>{{ $attendance['break_total'] ?? '' }}</td>
                 <td>{{ $attendance['work_total'] ?? '' }}</td>
                 <td class="data__detail">
-                    @if($attendance['attendance'])
-                        <a href="{{ url('admin/attendance/'.($attendance['attendance']->id)) }}">詳細</a>
-                    @else
-                        <a href="{{ url('admin/attendance/') }}?date={{ $currentDay->format('Y-m-d')}}">詳細</a>
-                    @endif
+                    <a href="{{ route('admin.attendance.detail', ['attendance_id' => $attendance['attendance']->id]) }}">詳細</a>
                 </td>
             </tr>
         @endforeach
