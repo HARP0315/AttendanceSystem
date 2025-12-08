@@ -44,10 +44,10 @@ class AdminAttendanceController extends Controller
         foreach ($users as $user) {
 
             $attendance = Attendance::where('user_id', $user->id)
-                ->where('work_date', $currentDay->format('Y-m-d'))
-                ->where('is_deleted', '=', 0)
-                ->with('breakRecords')
-                ->first();
+                                    ->where('work_date', $currentDay->format('Y-m-d'))
+                                    ->where('is_deleted', '=', 0)
+                                    ->with('breakRecords')
+                                    ->first();
 
             if (!$attendance) {
                 continue;
@@ -233,16 +233,24 @@ class AdminAttendanceController extends Controller
 
             $existingBreaksArray = $attendance->breakRecords->map(function($b){
                 return [
-                    'start' => $b['break_start_time'] ? Carbon::parse($b['break_start_time'])->format('H:i') : null,
-                    'end'   => $b['break_end_time'] ? Carbon::parse($b['break_end_time'])->format('H:i') : null,
+                    'start' => $b['break_start_time']
+                        ? Carbon::parse($b['break_start_time'])->format('H:i')
+                        : null,
+                    'end'   => $b['break_end_time']
+                        ? Carbon::parse($b['break_end_time'])->format('H:i')
+                        : null,
                 ];
             })->toArray();
 
             $submittedBreaksFiltered = collect($form['breaks'] ?? [])
                 ->filter(fn($b) => !empty($b['break_start_time']) || !empty($b['break_end_time']))
                 ->map(fn($b) => [
-                    'start' => $b['break_start_time'] ? Carbon::parse($b['break_start_time'])->format('H:i') : null,
-                    'end'   => $b['break_end_time']   ? Carbon::parse($b['break_end_time'])->format('H:i') : null,
+                    'start' => $b['break_start_time']
+                        ? Carbon::parse($b['break_start_time'])->format('H:i')
+                        : null,
+                    'end'   => $b['break_end_time']
+                        ? Carbon::parse($b['break_end_time'])->format('H:i')
+                        : null,
                 ])
                 ->values()
                 ->toArray();
@@ -334,7 +342,7 @@ class AdminAttendanceController extends Controller
                     'is_deleted'     => 0,
                 ]);
 
-            } catch (\Illuminate\Database\QueryException $e) {
+            } catch (\Illuminate\Database\QueryException) {
 
                 return back()
                     ->withErrors(['error' => 'この日の勤怠はすでに作成されています'])
@@ -401,8 +409,12 @@ class AdminAttendanceController extends Controller
                 if (isset($attendances[$dateStr])) {
                     $attendance = $attendances[$dateStr];
 
-                    $workStart = $attendance->work_start_time ? Carbon::parse($attendance->work_start_time) : null;
-                    $workEnd   = $attendance->work_end_time   ? Carbon::parse($attendance->work_end_time)   : null;
+                    $workStart = $attendance->work_start_time
+                        ? Carbon::parse($attendance->work_start_time)
+                        : null;
+                    $workEnd   = $attendance->work_end_time
+                        ? Carbon::parse($attendance->work_end_time)
+                        : null;
 
                     $breakRecords = $attendance->breakRecords;
 
@@ -683,8 +695,12 @@ class AdminAttendanceController extends Controller
             }
         }
 
-        $workStart = $attendance && $attendance->work_start_time ? Carbon::parse($attendance->work_start_time)->format('H:i') : '';
-        $workEnd   = $attendance && $attendance->work_end_time ? Carbon::parse($attendance->work_end_time)->format('H:i') : '';
+        $workStart = $attendance && $attendance->work_start_time
+            ? Carbon::parse($attendance->work_start_time)->format('H:i')
+            : '';
+        $workEnd   = $attendance && $attendance->work_end_time
+            ? Carbon::parse($attendance->work_end_time)->format('H:i')
+            : '';
 
         $breakTotal = $breakTotal > 0 ? $breakTotal : null;
         $workTotal  = $workTotal > 0 ? $workTotal : null;

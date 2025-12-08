@@ -60,8 +60,8 @@ class StaffAttendanceController extends Controller
                     'status'          => 1,
                     'is_deleted'      => 0,
                 ]);
-            } catch (\Illuminate\Database\QueryException $e) {
-                return back()->withErrors('この日の勤怠はすでに作成されています！');
+            } catch (\Illuminate\Database\QueryException) {
+                return back();
             }
 
             return back();
@@ -97,8 +97,8 @@ class StaffAttendanceController extends Controller
         if ($action === 'break_end') {
 
             $break = BreakTime::where('attendance_id', $attendance->id)
-                                ->whereNull('break_end_time')
-                                ->first();
+                              ->whereNull('break_end_time')
+                              ->first();
 
             if ($break) {
                 $break->update([
@@ -126,8 +126,8 @@ class StaffAttendanceController extends Controller
         $userId = Auth::id();
 
         $date = $request->query('month')
-        ? Carbon::parse($request->query('month'))->startOfMonth()
-        : Carbon::now()->startOfMonth();
+            ? Carbon::parse($request->query('month'))->startOfMonth()
+            : Carbon::now()->startOfMonth();
 
         $startOfMonth = $date->copy()->startOfMonth();
         $endOfMonth   = $date->copy()->endOfMonth();
@@ -321,16 +321,24 @@ class StaffAttendanceController extends Controller
 
             $existingBreaksArray = $attendance->breakRecords->map(function($b){
                 return [
-                    'start' => $b['break_start_time'] ? Carbon::parse($b['break_start_time'])->format('H:i') : null,
-                    'end'   => $b['break_end_time'] ? Carbon::parse($b['break_end_time'])->format('H:i') : null,
+                    'start' => $b['break_start_time']
+                        ? Carbon::parse($b['break_start_time'])->format('H:i')
+                        : null,
+                    'end'   => $b['break_end_time']
+                        ? Carbon::parse($b['break_end_time'])->format('H:i')
+                        : null,
                 ];
             })->toArray();
 
             $submittedBreaksFiltered = collect($form['breaks'] ?? [])
                 ->filter(fn($b) => !empty($b['break_start_time']) || !empty($b['break_end_time']))
                 ->map(fn($b) => [
-                    'start' => $b['break_start_time'] ? Carbon::parse($b['break_start_time'])->format('H:i') : null,
-                    'end'   => $b['break_end_time']   ? Carbon::parse($b['break_end_time'])->format('H:i') : null,
+                    'start' => $b['break_start_time']
+                        ? Carbon::parse($b['break_start_time'])->format('H:i')
+                        : null,
+                    'end'   => $b['break_end_time']
+                        ? Carbon::parse($b['break_end_time'])->format('H:i')
+                        : null,
                 ])
                 ->values()
                 ->toArray();

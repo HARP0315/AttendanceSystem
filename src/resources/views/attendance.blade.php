@@ -19,12 +19,6 @@
         $todayStr = $today->format('Y年m月d日') . ' (' . $w[$today->dayOfWeek] . ')';
     @endphp
 
-    <div class=error-massage__area>
-        @if ($errors->has('error'))
-            <p class="error-message2">{{ $errors->first('error') }}</p>
-        @endif
-    </div>
-
     {{-- 勤務外 --}}
     @if(!$attendance)
         <div class=attendance__status>勤務外</div>
